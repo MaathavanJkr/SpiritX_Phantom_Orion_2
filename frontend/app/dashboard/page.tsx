@@ -6,6 +6,7 @@ import { Overview } from "@/components/dashboard/overview"
 import { TeamPlayers } from "@/components/dashboard/team-players"
 
 export default function DashboardPage() {
+
   return (
     <div className="w-full space-y-6">
       <div>
@@ -106,6 +107,7 @@ export default function DashboardPage() {
           <TeamPlayers />
         </TabsContent>
       </Tabs>
+
     </div>
   )
 }

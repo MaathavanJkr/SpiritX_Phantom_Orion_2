@@ -18,7 +18,7 @@ export default function DashboardSidebar() {
 
   const menuItems = [
     { icon: Home, label: "Home", href: "/dashboard" },
-    { icon: Users, label: "Team Players", href: "/dashboard/team" },
+    { icon: Users, label: "All Players", href: "/dashboard/all-players" },    
     { icon: BarChart2, label: "Statistics", href: "/dashboard/statistics" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ]

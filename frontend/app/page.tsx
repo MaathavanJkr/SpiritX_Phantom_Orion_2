@@ -1,43 +1,31 @@
 'use client';
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import AuthForm from "@/components/auth/auth-form";
 
 export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        router.push("/auth/login");
-      } else {
-        setUsername(localStorage.getItem("user_name"));
-        setLoading(false);
-      }
-  }, []);
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      router.push("/dashboard");
+    } else {
+      setLoading(false);
+    }
+  }, [router]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    router.push("/auth/login");
-  };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          <h1 className="text-4xl font-bold mb-4">Welcome, {username}</h1>
-          <button 
-        onClick={handleLogout} 
-        className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-          >
-        Logout
-          </button>
-        </>
-      )}
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+      <div className="w-full max-w-md">
+          <AuthForm />
+      </div>
     </main>
-  )
+  );
 }

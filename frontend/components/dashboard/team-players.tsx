@@ -8,91 +8,114 @@ import { Chart, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/comp
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { Search } from "lucide-react"
 import { Tooltip } from "recharts"
+import { useEffect } from "react";
+import { Player } from "@/types/playerTypes"
+import { getPlayers } from "@/services/playerService"
+
 
 // Sample player data
-const players = [
-  {
-    id: 1,
-    name: "Alex Johnson",
-    position: "Forward",
-    avatar: "/placeholder.svg?height=40&width=40",
-    stats: {
-      goals: 24,
-      assists: 12,
-      passes: 85,
-      tackles: 45,
-      speed: 92,
-    },
-  },
-  {
-    id: 2,
-    name: "Maria Garcia",
-    position: "Midfielder",
-    avatar: "/placeholder.svg?height=40&width=40",
-    stats: {
-      goals: 14,
-      assists: 22,
-      passes: 92,
-      tackles: 65,
-      speed: 88,
-    },
-  },
-  {
-    id: 3,
-    name: "James Wilson",
-    position: "Defender",
-    avatar: "/placeholder.svg?height=40&width=40",
-    stats: {
-      goals: 5,
-      assists: 8,
-      passes: 78,
-      tackles: 90,
-      speed: 85,
-    },
-  },
-  {
-    id: 4,
-    name: "Sarah Lee",
-    position: "Forward",
-    avatar: "/placeholder.svg?height=40&width=40",
-    stats: {
-      goals: 22,
-      assists: 10,
-      passes: 75,
-      tackles: 40,
-      speed: 94,
-    },
-  },
-  {
-    id: 5,
-    name: "David Kim",
-    position: "Goalkeeper",
-    avatar: "/placeholder.svg?height=40&width=40",
-    stats: {
-      goals: 0,
-      assists: 2,
-      passes: 65,
-      tackles: 15,
-      speed: 75,
-    },
-  },
-]
+// const players = [
+//   {
+//     id: 1,
+//     name: "Alex Johnson",
+//     position: "Forward",
+//     avatar: "/placeholder.svg?height=40&width=40",
+//     stats: {
+//       goals: 24,
+//       assists: 12,
+//       passes: 85,
+//       tackles: 45,
+//       speed: 92,
+//     },
+//   },
+//   {
+//     id: 2,
+//     name: "Maria Garcia",
+//     position: "Midfielder",
+//     avatar: "/placeholder.svg?height=40&width=40",
+//     stats: {
+//       goals: 14,
+//       assists: 22,
+//       passes: 92,
+//       tackles: 65,
+//       speed: 88,
+//     },
+//   },
+//   {
+//     id: 3,
+//     name: "James Wilson",
+//     position: "Defender",
+//     avatar: "/placeholder.svg?height=40&width=40",
+//     stats: {
+//       goals: 5,
+//       assists: 8,
+//       passes: 78,
+//       tackles: 90,
+//       speed: 85,
+//     },
+//   },
+//   {
+//     id: 4,
+//     name: "Sarah Lee",
+//     position: "Forward",
+//     avatar: "/placeholder.svg?height=40&width=40",
+//     stats: {
+//       goals: 22,
+//       assists: 10,
+//       passes: 75,
+//       tackles: 40,
+//       speed: 94,
+//     },
+//   },
+//   {
+//     id: 5,
+//     name: "David Kim",
+//     position: "Goalkeeper",
+//     avatar: "/placeholder.svg?height=40&width=40",
+//     stats: {
+//       goals: 0,
+//       assists: 2,
+//       passes: 65,
+//       tackles: 15,
+//       speed: 75,
+//     },
+//   },
+// ]
 
 export function TeamPlayers() {
-  const [selectedPlayer, setSelectedPlayer] = useState(players[0])
-  const [searchQuery, setSearchQuery] = useState("")
 
-  // Convert player stats to chart data
-  const playerStatsData = Object.entries(selectedPlayer.stats).map(([key, value]) => ({
-    stat: key.charAt(0).toUpperCase() + key.slice(1),
-    value,
-  }))
+
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    // const fetchPlayers = async () => {
+    //     try {
+    //         const data = await getPlayers();
+    //         setPlayers(data);
+    //     } catch (err : any) {
+    //         setError(err.message);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+    //     fetchPlayers(); 
+    }, []); 
+
+    const [selectedPlayer, setSelectedPlayer] = useState(players[0])
+    const [searchQuery, setSearchQuery] = useState("")
+
+    // Convert player stats to chart data
+    const playerStatsData = Object.entries(selectedPlayer).map(([stat, value]) => ({
+      stat,
+      value,
+    }))
 
   // Filter players based on search query
-  const filteredPlayers = players.filter(
-    (player) =>
-      player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      player.position.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredPlayers = players.filter((player) =>
+    player.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
@@ -124,7 +147,7 @@ export function TeamPlayers() {
                   onClick={() => setSelectedPlayer(player)}
                 >
                   <Avatar className="h-10 w-10 mr-3">
-                    <AvatarImage src={player.avatar} alt={player.name} />
+                    {/* <AvatarImage src={player.avatar} alt={player.name} /> */}
                     <AvatarFallback>
                       {player.name
                         .split(" ")
@@ -134,7 +157,7 @@ export function TeamPlayers() {
                   </Avatar>
                   <div className="space-y-1 flex-1">
                     <p className="text-sm font-medium leading-none">{player.name}</p>
-                    <p className="text-xs text-muted-foreground">{player.position}</p>
+                    <p className="text-xs text-muted-foreground">{player.category}</p>
                   </div>
                 </div>
               ))}
@@ -173,47 +196,49 @@ export function TeamPlayers() {
               <div className="w-full md:w-64 space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm">Goals</span>
-                    <span className="font-medium">{selectedPlayer.stats.goals}</span>
+                    <span className="text-sm">Balls faced</span>
+                    <span className="font-medium">{selectedPlayer.balls_faced}</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.stats.goals}%` }}></div>
+                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.balls_faced}%` }}></div>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm">Assists</span>
-                    <span className="font-medium">{selectedPlayer.stats.assists}</span>
+                    <span className="text-sm">Runs Scored</span>
+                    <span className="font-medium">{selectedPlayer.runs_conceded}</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.stats.assists}%` }}></div>
+                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.runs_conceded}%` }}></div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Innigs Played</span>
+                    <span className="font-medium">{selectedPlayer.innings_played}</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.innings_played}%` }}></div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Wickets</span>
+                    <span className="font-medium">{selectedPlayer.wickets}</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.wickets}%` }}></div>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm">Passes</span>
-                    <span className="font-medium">{selectedPlayer.stats.passes}</span>
+                    <span className="text-sm">Overs Bowled</span>
+                    <span className="font-medium">{selectedPlayer.overs_bowled}</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.stats.passes}%` }}></div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Tackles</span>
-                    <span className="font-medium">{selectedPlayer.stats.tackles}</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.stats.tackles}%` }}></div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Speed</span>
-                    <span className="font-medium">{selectedPlayer.stats.speed}</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.stats.speed}%` }}></div>
+                    <div className="h-full bg-primary" style={{ width: `${selectedPlayer.overs_bowled}%` }}></div>
                   </div>
                 </div>
               </div>

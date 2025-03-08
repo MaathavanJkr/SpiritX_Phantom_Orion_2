@@ -107,7 +107,7 @@ export default function AuthForm() {
       localStorage.setItem("user_name", response.user.username);
       localStorage.setItem("user_id", response.user.id.toString());
       // setLoginSuccess("Login successful!");
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       setLoginError("Invalid username or password. Please try again.");
     } finally {
