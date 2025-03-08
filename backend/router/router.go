@@ -19,6 +19,9 @@ var routes = []Route{
 	//Auth routes
 	{Path: "/auth/login", Security: "Public", Method: "POST", Handler: handlers.UserLogin},
 	{Path: "/auth/register", Security: "Public", Method: "POST", Handler: handlers.UserRegister},
+	{Path: "/auth/admin/login", Security: "Public", Method: "POST", Handler: handlers.AdminLogin},
+	{Path: "/auth/validate", Security: "User", Method: "GET", Handler: handlers.ValidateToken},
+	{Path: "/auth/validate/admin", Security: "Admin", Method: "GET", Handler: handlers.ValidateToken},
 
 	//user routes
 	{Path: "/users/add", Security: "User", Method: "POST", Handler: handlers.AddUser},
@@ -26,7 +29,6 @@ var routes = []Route{
 	{Path: "/users/:id", Security: "User", Method: "GET", Handler: handlers.GetUserByID},
 	{Path: "/users/:id", Security: "User", Method: "PUT", Handler: handlers.UpdateUser},
 	{Path: "/users/:id", Security: "User", Method: "DELETE", Handler: handlers.DeleteUser},
-	{Path: "/users/approve/:id", Security: "User", Method: "PUT", Handler: handlers.ApproveUser},
 
 	//player routes
 	{Path: "/players/add", Security: "User", Method: "POST", Handler: handlers.AddPlayer},
@@ -48,7 +50,7 @@ var routes = []Route{
 	{Path: "/teams/:id", Security: "User", Method: "PUT", Handler: handlers.UpdateTeam},
 	{Path: "/teams/:id", Security: "User", Method: "DELETE", Handler: handlers.DeleteTeam},
 
-	{Path: "/v1/teams/players/add", Security: "User", Method: "POST", Handler: handlers.AddPlayersToTeamByUserID},
+	{Path: "/v1/teams/players/assign", Security: "User", Method: "POST", Handler: handlers.AssingPlayersToTeamByUserID},
 	{Path: "/v1/teams/my", Security: "User", Method: "GET", Handler: handlers.GetTeamPlayersViewForUser},
 }
 

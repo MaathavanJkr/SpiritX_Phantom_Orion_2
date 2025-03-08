@@ -12,6 +12,7 @@ type Team struct {
 	UserID  uint      `json:"user_id" gorm:"not null;unique"` // Changed from Owner to UserId and made unique
 	User    *User     `json:"user" gorm:"foreignKey:UserID"`
 	Players []*Player `json:"players" gorm:"many2many:team_players;"`
+	Points  int       `json:"points"`
 }
 
 // convertPlayers converts []*Player to []Player
@@ -27,6 +28,7 @@ type TeamPlayersView struct {
 	TeamName string   `json:"team_name"`
 	Players  []Player `json:"players"`
 	IsFound  bool     `json:"is_found"`
+	Points   int      `json:"points"`
 }
 
 type TeamPlayers struct {
@@ -41,9 +43,9 @@ func AddTeam(team *Team) error {
 }
 
 // AddPlayersToTeamByUserID adds players to a team by user ID and player IDs
-func AddPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
+func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 	var team Team
-	result := db.ORM.Preload("Players").Where("user_id = ?", teamPlayers.UserID).First(&team)
+	result := db.ORM.Preload("Players").Preload("User").Where("user_id = ?", teamPlayers.UserID).First(&team)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -59,8 +61,23 @@ func AddPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 		return fmt.Errorf("adding these players would exceed the maximum limit of 11 players per team")
 	}
 
+	// Calculate the total value of all players in the team
+	totalValue := 0
+	totalPoints := 0
+	for _, player := range players {
+		totalValue += player.Value // Assuming Player struct has a Value field
+		totalPoints += player.Points
+	}
+
+	// Check if the total value exceeds the user's budget
+	if totalValue > team.User.Budget { // Assuming User struct has a Budget field
+		return fmt.Errorf("the total value of the players exceeds the user's budget")
+	}
+
+	team.Points = totalPoints
+
 	// Append players to the team's Players association
-	err := db.ORM.Model(&team).Association("Players").Append(players)
+	err := db.ORM.Model(&team).Association("Players").Replace(players)
 	return err
 }
 
@@ -77,6 +94,7 @@ func GetTeamPlayersViewForUser(userID uint) (*TeamPlayersView, error) {
 	teamPlayersView := &TeamPlayersView{
 		TeamName: team.Name,
 		Players:  convertPlayers(team.Players),
+		Points:   team.Points,
 		IsFound:  true,
 	}
 
