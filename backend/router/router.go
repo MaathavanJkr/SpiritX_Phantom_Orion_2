@@ -48,7 +48,8 @@ var routes = []Route{
 	{Path: "/teams/:id", Security: "User", Method: "PUT", Handler: handlers.UpdateTeam},
 	{Path: "/teams/:id", Security: "User", Method: "DELETE", Handler: handlers.DeleteTeam},
 
-	{Path: "/v1/teams/addplayers", Security: "User", Method: "POST", Handler: handlers.AddPlayersToTeamByUserID},
+	{Path: "/v1/teams/players/add", Security: "User", Method: "POST", Handler: handlers.AddPlayersToTeamByUserID},
+	{Path: "/v1/teams/my", Security: "User", Method: "GET", Handler: handlers.GetTeamPlayersViewForUser},
 }
 
 func NewRouter() *gin.Engine {
