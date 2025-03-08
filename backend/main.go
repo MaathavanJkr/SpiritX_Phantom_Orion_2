@@ -21,6 +21,8 @@ func main() {
 	}
 
 	db.ORM.AutoMigrate(&models.User{})
+	db.ORM.AutoMigrate(&models.Team{})
+	db.ORM.AutoMigrate(&models.Player{})
 
 	r := router.NewRouter()
 	log.Fatal(r.Run(fmt.Sprintf(":%s", config.Port)))
