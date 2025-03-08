@@ -100,7 +100,7 @@ func DeleteTeam(c *gin.Context) {
 
 //Add players to the team by user
 
-func AddPlayersToTeamByUserID(c *gin.Context) {
+func AssingPlayersToTeamByUserID(c *gin.Context) {
 	var payload struct {
 		PlayerIDs []uint `json:"player_ids"`
 	}
@@ -121,7 +121,7 @@ func AddPlayersToTeamByUserID(c *gin.Context) {
 		PlayerIDs: payload.PlayerIDs,
 	}
 
-	err := models.AddPlayersToTeamByUserID(teamPlayers)
+	err := models.AssignPlayersToTeamByUserID(teamPlayers)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

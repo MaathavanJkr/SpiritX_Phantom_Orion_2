@@ -83,15 +83,20 @@ func GetAllPlayersByFilter(c *gin.Context) {
 		var playersForUser []models.PlayerForUser
 		for _, player := range players {
 			playersForUser = append(playersForUser, models.PlayerForUser{
-				Name:          player.Name,
-				University:    player.University,
-				Category:      player.Category,
-				TotalRuns:     player.TotalRuns,
-				BallsFaced:    player.BallsFaced,
-				InningsPlayed: player.InningsPlayed,
-				Wickets:       player.Wickets,
-				OversBowled:   player.OversBowled,
-				RunsConceded:  player.RunsConceded,
+				Name:              player.Name,
+				University:        player.University,
+				Category:          player.Category,
+				TotalRuns:         player.TotalRuns,
+				BallsFaced:        player.BallsFaced,
+				InningsPlayed:     player.InningsPlayed,
+				Wickets:           player.Wickets,
+				OversBowled:       player.OversBowled,
+				RunsConceded:      player.RunsConceded,
+				Value:             player.Value,
+				BattingStrikeRate: player.BattingStrikeRate,
+				BattingAverage:    player.BattingAverage,
+				BowingStrikeRate:  player.BowingStrikeRate,
+				EconomyRate:       player.EconomyRate,
 			})
 		}
 		c.JSON(http.StatusOK, playersForUser)
@@ -141,39 +146,4 @@ func GetTournamentSummary(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, summary)
-}
-
-func AddPlayersToTeam(c *gin.Context) {
-	// Define a new struct for binding the JSON payload
-	var payload struct {
-		PlayerIDs []uint `json:"player_ids"`
-	}
-
-	// Bind the JSON payload to the new struct
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Retrieve the user ID from the context
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found"})
-		return
-	}
-
-	// Create a TeamPlayers struct and set the UserID and PlayerIDs
-	teamPlayers := models.TeamPlayers{
-		UserID:    userID.(uint),
-		PlayerIDs: payload.PlayerIDs,
-	}
-
-	// Call the model function to add players to the team
-	err := models.AddPlayersToTeamByUserID(teamPlayers)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully added players to team"})
 }

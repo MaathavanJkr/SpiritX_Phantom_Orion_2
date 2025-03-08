@@ -14,7 +14,9 @@ type User struct {
 	Username string `json:"username" gorm:"unique"`
 	Password string `json:"-"`
 	Approved bool   `json:"approved"`
+	Budget   int    `json:"budget"`
 }
+
 type UserWithPassword struct {
 	User
 	Password string `json:"password"`
@@ -115,4 +117,16 @@ func DeleteUserByID(id string) error {
 	var user *User
 	result := db.ORM.Delete(&user, id)
 	return result.Error
+}
+
+func ReduceBudgetByAmount(id string, budget int) error {
+	user, err := GetUserByID(id)
+	if err != nil {
+		return err
+	}
+	if budget > user.Budget {
+		return fmt.Errorf("insufficient budget")
+	}
+	user.Budget -= budget
+	return UpdateUserByID(user)
 }

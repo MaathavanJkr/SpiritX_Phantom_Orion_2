@@ -41,9 +41,9 @@ func AddTeam(team *Team) error {
 }
 
 // AddPlayersToTeamByUserID adds players to a team by user ID and player IDs
-func AddPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
+func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 	var team Team
-	result := db.ORM.Preload("Players").Where("user_id = ?", teamPlayers.UserID).First(&team)
+	result := db.ORM.Preload("Players").Preload("User").Where("user_id = ?", teamPlayers.UserID).First(&team)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -59,8 +59,19 @@ func AddPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 		return fmt.Errorf("adding these players would exceed the maximum limit of 11 players per team")
 	}
 
+	// Calculate the total value of all players in the team
+	totalValue := 0
+	for _, player := range players {
+		totalValue += player.Value // Assuming Player struct has a Value field
+	}
+
+	// Check if the total value exceeds the user's budget
+	if totalValue > team.User.Budget { // Assuming User struct has a Budget field
+		return fmt.Errorf("the total value of the players exceeds the user's budget")
+	}
+
 	// Append players to the team's Players association
-	err := db.ORM.Model(&team).Association("Players").Append(players)
+	err := db.ORM.Model(&team).Association("Players").Replace(players)
 	return err
 }
 
