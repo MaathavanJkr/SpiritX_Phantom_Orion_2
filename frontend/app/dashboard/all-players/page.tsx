@@ -7,8 +7,8 @@ export default function PlayersPage() {
   return (
     <div className="w-full space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Players</h1>
-        <p className="text-muted-foreground">View and manage all team players</p>
+        <h1 className="text-3xl font-bold tracking-tight">All Players</h1>
+        <p className="text-muted-foreground">View all team players and their stats</p>
       </div>
 
       <Suspense fallback={<PlayersGridSkeleton />}>
