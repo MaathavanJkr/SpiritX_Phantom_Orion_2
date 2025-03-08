@@ -32,7 +32,7 @@ func GetTeamByID(id string) (*Team, error) {
 func GetAllTeams() ([]*Team, error) {
 	var teams []*Team
 
-	result := db.ORM.Model(&Team{}).Preload("Users").Find(&teams)
+	result := db.ORM.Model(&Team{}).Preload("Players").Find(&teams)
 	if result.Error != nil {
 		return nil, result.Error
 	}
