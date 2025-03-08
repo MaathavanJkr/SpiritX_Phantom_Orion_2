@@ -4,6 +4,7 @@ const axiosInstance = axios.create({
   baseURL:  import.meta.env.VITE_BACKEND_URL || "http://localhost:8080", // Update this if your API URL is different
   headers: {
     "Content-Type": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("token")}`,
   },
 });
 
