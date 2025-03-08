@@ -34,6 +34,12 @@ var routes = []Route{
 	{Path: "/players/:id", Security: "User", Method: "GET", Handler: handlers.GetPlayerByID},
 	{Path: "/players/:id", Security: "User", Method: "PUT", Handler: handlers.UpdatePlayer},
 	{Path: "/players/:id", Security: "User", Method: "DELETE", Handler: handlers.DeletePlayer},
+	{Path: "/players/filter", Security: "Admin", Method: "GET", Handler: handlers.GetAllPlayersByFilter},
+
+	{Path: "/v1/players/filter", Security: "User", Method: "GET", Handler: handlers.GetAllPlayersByFilter},
+
+	//Touranment routes
+	{Path: "/tournament/summary", Security: "User", Method: "GET", Handler: handlers.GetTournamentSummary},
 
 	//team routes
 	{Path: "/teams/add", Security: "User", Method: "POST", Handler: handlers.AddTeam},
@@ -41,6 +47,9 @@ var routes = []Route{
 	{Path: "/teams/:id", Security: "User", Method: "GET", Handler: handlers.GetTeamByID},
 	{Path: "/teams/:id", Security: "User", Method: "PUT", Handler: handlers.UpdateTeam},
 	{Path: "/teams/:id", Security: "User", Method: "DELETE", Handler: handlers.DeleteTeam},
+
+	{Path: "/v1/teams/players/add", Security: "User", Method: "POST", Handler: handlers.AddPlayersToTeamByUserID},
+	{Path: "/v1/teams/my", Security: "User", Method: "GET", Handler: handlers.GetTeamPlayersViewForUser},
 }
 
 func NewRouter() *gin.Engine {
@@ -76,7 +85,7 @@ func NewRouter() *gin.Engine {
 		} else if route.Security == "User" {
 			registerRoute(userAuth, route)
 		} else if route.Security == "Admin" {
-			registerRoute(userAuth, route)
+			registerRoute(adminAuth, route)
 		}
 	}
 
