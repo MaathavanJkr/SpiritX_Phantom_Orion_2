@@ -58,6 +58,16 @@ func GetPlayersByFilters(filters map[string]interface{}) ([]*Player, error) {
 	return players, nil
 }
 
+func GetPlayerStats() ([]*Player, error) {
+	var players []*Player
+
+	result := db.ORM.Find(&players)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return players, nil
+}
+
 // UpdatePlayerByID updates an existing player record in the database
 func UpdatePlayerByID(player *Player) error {
 	result := db.ORM.Save(&player)
