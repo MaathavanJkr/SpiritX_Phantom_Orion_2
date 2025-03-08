@@ -8,7 +8,8 @@ import (
 type Team struct {
 	GormModel
 	Name    string    `json:"name"`
-	UserID  string    `json:"user_id"` // Changed from Owner to UserId
+	UserID  string    `json:"user_id" gorm:"not null;unique"` // Changed from Owner to UserId and made unique
+	User    *User     `json:"user" gorm:"foreignKey:UserID"`
 	Players []*Player `json:"players" gorm:"many2many:team_players;"`
 }
 
