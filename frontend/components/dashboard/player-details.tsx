@@ -2,24 +2,6 @@ import { Player } from "@/types/playerTypes";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Chart,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { 
-  Bar, 
-  BarChart, 
-  ResponsiveContainer, 
-  XAxis, 
-  YAxis,
-  Tooltip,
-  Legend,
-  PieChart,
-  Pie,
-  Cell
-} from "recharts";
 
 interface PlayerDetailsProps {
   player: Player;
