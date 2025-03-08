@@ -14,6 +14,21 @@ type Team struct {
 	Players []*Player `json:"players" gorm:"many2many:team_players;"`
 }
 
+// convertPlayers converts []*Player to []Player
+func convertPlayers(players []*Player) []Player {
+	var result []Player
+	for _, player := range players {
+		result = append(result, *player)
+	}
+	return result
+}
+
+type TeamPlayersView struct {
+	TeamName string   `json:"team_name"`
+	Players  []Player `json:"players"`
+	IsFound  bool     `json:"is_found"`
+}
+
 type TeamPlayers struct {
 	UserID    uint   `json:"user_id"`
 	PlayerIDs []uint `json:"player_ids"`
@@ -49,7 +64,25 @@ func AddPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 	return err
 }
 
-// GetTeamByID retrieves a team record from the database by ID
+// GetTeamPlayersViewByUserID retrieves a team and its players by user ID and returns it as TeamPlayersView
+func GetTeamPlayersViewForUser(userID uint) (*TeamPlayersView, error) {
+	var team Team
+	result := db.ORM.Preload("Players").Where("user_id = ?", userID).First(&team)
+	if result.Error != nil {
+		return &TeamPlayersView{
+			IsFound: false,
+		}, nil
+	}
+
+	teamPlayersView := &TeamPlayersView{
+		TeamName: team.Name,
+		Players:  convertPlayers(team.Players),
+		IsFound:  true,
+	}
+
+	return teamPlayersView, nil
+}
+
 func GetTeamByID(id string) (*Team, error) {
 	var team *Team
 	result := db.ORM.First(&team, id)
