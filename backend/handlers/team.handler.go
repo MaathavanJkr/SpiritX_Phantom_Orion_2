@@ -145,3 +145,13 @@ func GetTeamPlayersViewForUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, teamPlayersView)
 }
+
+func GetTeamLeaderBoard(c *gin.Context) {
+	leaderBoard, err := models.GetTeamLeaderBoard()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, leaderBoard)
+}
