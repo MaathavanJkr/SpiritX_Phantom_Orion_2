@@ -76,6 +76,8 @@ func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 
 	team.Points = totalPoints
 
+	UpdateTeamByID(&team)
+
 	// Append players to the team's Players association
 	err := db.ORM.Model(&team).Association("Players").Replace(players)
 	return err
@@ -144,4 +146,14 @@ func DeleteTeamByID(id string) error {
 	var team *Team
 	result := db.ORM.Delete(&team, id)
 	return result.Error
+}
+
+func GetTeamLeaderBoard() ([]*Team, error) {
+	var teams []*Team
+
+	result := db.ORM.Model(&Team{}).Preload("Players").Preload("User").Find(&teams).Order("Points desc")
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return teams, nil
 }
