@@ -21,26 +21,34 @@ var routes = []Route{
 	{Path: "/auth/register", Security: "Public", Method: "POST", Handler: handlers.UserRegister},
 
 	//user routes
-	{Path: "/users/add", Security: "Admin", Method: "POST", Handler: handlers.AddUser},
-	{Path: "/users", Security: "Admin", Method: "GET", Handler: handlers.GetAllUsers},
-	{Path: "/users/:id", Security: "Admin", Method: "GET", Handler: handlers.GetUserByID},
-	{Path: "/users/:id", Security: "Admin", Method: "PUT", Handler: handlers.UpdateUser},
-	{Path: "/users/:id", Security: "Admin", Method: "DELETE", Handler: handlers.DeleteUser},
-	{Path: "/users/approve/:id", Security: "Admin", Method: "PUT", Handler: handlers.ApproveUser},
+	{Path: "/users/add", Security: "User", Method: "POST", Handler: handlers.AddUser},
+	{Path: "/users", Security: "User", Method: "GET", Handler: handlers.GetAllUsers},
+	{Path: "/users/:id", Security: "User", Method: "GET", Handler: handlers.GetUserByID},
+	{Path: "/users/:id", Security: "User", Method: "PUT", Handler: handlers.UpdateUser},
+	{Path: "/users/:id", Security: "User", Method: "DELETE", Handler: handlers.DeleteUser},
+	{Path: "/users/approve/:id", Security: "User", Method: "PUT", Handler: handlers.ApproveUser},
 
 	//player routes
-	{Path: "/players/add", Security: "Admin", Method: "POST", Handler: handlers.AddPlayer},
-	{Path: "/players", Security: "Admin", Method: "GET", Handler: handlers.GetAllPlayers},
-	{Path: "/players/:id", Security: "Admin", Method: "GET", Handler: handlers.GetPlayerByID},
-	{Path: "/players/:id", Security: "Admin", Method: "PUT", Handler: handlers.UpdatePlayer},
-	{Path: "/players/:id", Security: "Admin", Method: "DELETE", Handler: handlers.DeletePlayer},
+	{Path: "/players/add", Security: "User", Method: "POST", Handler: handlers.AddPlayer},
+	{Path: "/players", Security: "User", Method: "GET", Handler: handlers.GetAllPlayers},
+	{Path: "/players/:id", Security: "User", Method: "GET", Handler: handlers.GetPlayerByID},
+	{Path: "/players/:id", Security: "User", Method: "PUT", Handler: handlers.UpdatePlayer},
+	{Path: "/players/:id", Security: "User", Method: "DELETE", Handler: handlers.DeletePlayer},
+	{Path: "/players/filter", Security: "Admin", Method: "GET", Handler: handlers.GetAllPlayersByFilter},
+
+	{Path: "/v1/players/filter", Security: "User", Method: "GET", Handler: handlers.GetAllPlayersByFilter},
+
+	//Touranment routes
+	{Path: "/tournament/summary", Security: "User", Method: "GET", Handler: handlers.GetTournamentSummary},
 
 	//team routes
-	{Path: "/teams/add", Security: "Admin", Method: "POST", Handler: handlers.AddTeam},
-	{Path: "/teams", Security: "Admin", Method: "GET", Handler: handlers.GetAllTeams},
-	{Path: "/teams/:id", Security: "Admin", Method: "GET", Handler: handlers.GetTeamByID},
-	{Path: "/teams/:id", Security: "Admin", Method: "PUT", Handler: handlers.UpdateTeam},
-	{Path: "/teams/:id", Security: "Admin", Method: "DELETE", Handler: handlers.DeleteTeam},
+	{Path: "/teams/add", Security: "User", Method: "POST", Handler: handlers.AddTeam},
+	{Path: "/teams", Security: "User", Method: "GET", Handler: handlers.GetAllTeams},
+	{Path: "/teams/:id", Security: "User", Method: "GET", Handler: handlers.GetTeamByID},
+	{Path: "/teams/:id", Security: "User", Method: "PUT", Handler: handlers.UpdateTeam},
+	{Path: "/teams/:id", Security: "User", Method: "DELETE", Handler: handlers.DeleteTeam},
+
+	{Path: "/v1/teams/addplayers", Security: "User", Method: "POST", Handler: handlers.AddPlayersToTeamByUserID},
 }
 
 func NewRouter() *gin.Engine {
@@ -76,7 +84,7 @@ func NewRouter() *gin.Engine {
 		} else if route.Security == "User" {
 			registerRoute(userAuth, route)
 		} else if route.Security == "Admin" {
-			registerRoute(userAuth, route)
+			registerRoute(adminAuth, route)
 		}
 	}
 

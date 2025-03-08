@@ -1,0 +1,1 @@
+# SpiritX Admin Panel
