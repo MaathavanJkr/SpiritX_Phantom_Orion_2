@@ -98,6 +98,7 @@ func UserRegister(c *gin.Context) {
 		Password: hashedPassword,
 		Role:     "user",
 		Approved: true,
+		Budget:   9000000,
 	}
 
 	fmt.Printf("Registering user: %+v\n", user)

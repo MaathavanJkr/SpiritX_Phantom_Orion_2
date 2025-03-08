@@ -82,20 +82,3 @@ func DeleteUser(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted user"})
 }
-
-func ApproveUser(c *gin.Context) {
-	id := c.Param("id")
-	user, err := models.GetUserByID(id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	user.Approved = true
-	err = models.UpdateUserByID(user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully approved user"})
-}
