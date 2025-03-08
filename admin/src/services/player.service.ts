@@ -21,7 +21,7 @@ export const getPlayer = async (id: number) => {
 
 export const createPlayer = async (player: Player) => {
   try {
-    const response = await axios.post("/players", player);
+    const response = await axios.post("/players/add", player);
     return response.data || {};
   } catch (error: any) {
     throw new Error(error.response?.data?.details || "Failed to create player");

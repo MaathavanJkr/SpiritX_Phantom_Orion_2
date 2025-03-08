@@ -16,6 +16,8 @@ import {
 } from "../../services/player.service";
 
 import { ToastContainer, toast } from "react-toastify";
+import Badge from "../ui/badge/Badge";
+import Avatar from "../ui/avatar/Avatar";
 
 export default function PlayersTable() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -79,7 +81,7 @@ export default function PlayersTable() {
     e.preventDefault();
     if (selectedPlayer) {
       updatePlayer(selectedPlayer)
-        .then((data) => {
+        .then(() => {
           toast.success("Player Updated Succesfully");
           setPlayersData((prevPlayers) =>
             prevPlayers.map((player) =>
@@ -98,7 +100,7 @@ export default function PlayersTable() {
     e.preventDefault();
     if (selectedPlayer) {
       deletePlayer(selectedPlayer.id)
-        .then((data) => {
+        .then(() => {
           toast.success("Player Deleted Succesfully");
           setPlayersData((prevPlayers) =>
             prevPlayers.filter((player) => player.id !== selectedPlayer.id)
@@ -139,19 +141,25 @@ export default function PlayersTable() {
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="px-1 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     University
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="px-1 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     Category
                   </TableCell>
                   <TableCell
                     isHeader
-                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                    className="px-1 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  >
+                    Points
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="px-1 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                   >
                     Actions
                   </TableCell>
@@ -162,18 +170,21 @@ export default function PlayersTable() {
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {playersData.map((player, index) => (
                   <TableRow key={index}>
-                    <TableCell className="px-5 py-4 sm:px-6 text-start">
+                    <TableCell className="px-1 py-4 sm:px-6 text-start">
                       <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
                         {player.name}
                       </span>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    <TableCell className="px-1 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                       {player.university}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    <TableCell className="px-1 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                       {player.category}
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    <TableCell className="px-1 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                      {player.points}
+                    </TableCell>
+                    <TableCell className="px-1 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                       <div className="flex items-center space-x-2">
                         <button
                           className="p-1 text-gray-500 hover:text-blue-500 rounded-full"
@@ -205,7 +216,7 @@ export default function PlayersTable() {
         {isModalOpen && selectedPlayer && (
           <div className="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto modal z-99999">
             <div className="modal-close-btn fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-sm"></div>
-            <div className="relative w-full max-w-[600px] rounded-3xl bg-white p-6 dark:bg-gray-900 lg:p-10">
+            <div className="relative w-full max-w-[700px] rounded-3xl bg-white p-6 dark:bg-gray-900 lg:p-10">
               <button
                 onClick={closeModal}
                 className="absolute right-3 top-3 z-999 flex h-9.5 w-9.5 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-6 sm:top-6 sm:h-11 sm:w-11"
@@ -230,84 +241,134 @@ export default function PlayersTable() {
               <div>
                 {modalType === "view" && (
                   <>
-                    <h4 className="font-semibold text-gray-800 mb-4 text-title-sm dark:text-white/90">
-                      {selectedPlayer.name}
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                          University:
-                        </span>
-                        <span className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                          {selectedPlayer.university}
-                        </span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                          Category:
-                        </span>
-                        <span className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                          {selectedPlayer.category}
-                        </span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                          Total Runs:
-                        </span>
-                        <div className="p-4 bg-gray-100 rounded-lg shadow-md dark:bg-gray-700">
-                          <span className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                            {selectedPlayer.total_runs}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-700">
+                          <span className="text-lg font-medium">
+                            {selectedPlayer.name.split(' ').map(n => n[0]).join('')}
                           </span>
                         </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                          Balls Faced:
-                        </span>
-                        <div className="p-4 bg-gray-100 rounded-lg shadow-md dark:bg-gray-700">
-                          <span className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                            {selectedPlayer.balls_faced}
-                          </span>
+                        <div>
+                          <h2 className="text-2xl font-bold">{selectedPlayer.name}</h2>
+                          <p className="text-muted-foreground">{selectedPlayer.university}</p>
+                          <Badge>{selectedPlayer.category}</Badge>
                         </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                          Innings Played:
-                        </span>
-                        <div className="p-4 bg-gray-100 rounded-lg shadow-md dark:bg-gray-700">
-                          <span className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                            {selectedPlayer.innings_played}
-                          </span>
-                        </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                        {selectedPlayer.category === "Bowler" && (
+                          <div className="space-y-4">
+                            <h3 className="text-lg font-semibold">Bowling Statistics</h3>
+                            <div className="grid grid-cols-4 gap-4">
+                              <div className="bg-gray-200 rounded-lg p-3">
+                                <div className="text-sm text-muted-foreground">Wickets</div>
+                                <div className="text-2xl font-bold">{selectedPlayer.wickets}</div>
+                              </div>
+                              <div className="bg-gray-200 rounded-lg p-3">
+                                <div className="text-sm text-muted-foreground">Economy Rate</div>
+                                <div className="text-2xl font-bold">{selectedPlayer.economy_rate.toFixed(2)}</div>
+                              </div>
+                              <div className="bg-gray-200 rounded-lg p-3">
+                                <div className="text-sm text-muted-foreground">Overs Bowled</div>
+                                <div className="text-2xl font-bold">{selectedPlayer.overs_bowled.toFixed(2)}</div>
+                              </div>
+                            </div>
+                            <div className="space-y-4">
+                              <h3 className="text-lg font-semibold">Batting Statistics</h3>
+                              <div className="grid grid-cols-4 gap-4">
+                                <div className="bg-gray-200 rounded-lg p-3">
+                                  <div className="text-sm text-muted-foreground">Total Runs</div>
+                                  <div className="text-2xl font-bold">{selectedPlayer.total_runs}</div>
+                                </div>
+                                <div className="bg-gray-200 rounded-lg p-3">
+                                  <div className="text-sm text-muted-foreground">Batting Average</div>
+                                  <div className="text-2xl font-bold">{selectedPlayer.batting_average.toFixed(2)}</div>
+                                </div>
+                                <div className="bg-gray-200 rounded-lg p-3">
+                                  <div className="text-sm text-muted-foreground">Strike Rate</div>
+                                  <div className="text-2xl font-bold">{selectedPlayer.batting_strike_rate.toFixed(2)}</div>
+                                </div>
+                                <div className="bg-gray-200 rounded-lg p-3">
+                                  <div className="text-sm text-muted-foreground">Innings</div>
+                                  <div className="text-2xl font-bold">{selectedPlayer.innings_played}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {(selectedPlayer.category === "All-Rounder" || selectedPlayer.category === "Batsman") && (
+                          <div className="space-y-4">
+                            <div className="space-y-4">
+                              <h3 className="text-lg font-semibold">Batting Statistics</h3>
+                              <div className="grid grid-cols-4 gap-4">
+                                <div className="bg-gray-200 rounded-lg p-3">
+                                  <div className="text-sm text-muted-foreground">Total Runs</div>
+                                  <div className="text-2xl font-bold">{selectedPlayer.total_runs}</div>
+                                </div>
+                                <div className="bg-gray-200 rounded-lg p-3">
+                                  <div className="text-sm text-muted-foreground">Batting Average</div>
+                                  <div className="text-2xl font-bold">{selectedPlayer.batting_average.toFixed(2)}</div>
+                                </div>
+                                <div className="bg-gray-200 rounded-lg p-3">
+                                  <div className="text-sm text-muted-foreground">Strike Rate</div>
+                                  <div className="text-2xl font-bold">{selectedPlayer.batting_strike_rate.toFixed(2)}</div>
+                                </div>
+                                <div className="bg-gray-200 rounded-lg p-3">
+                                  <div className="text-sm text-muted-foreground">Innings</div>
+                                  <div className="text-2xl font-bold">{selectedPlayer.innings_played}</div>
+                                </div>
+                              </div>
+                            </div>
+                            <h3 className="text-lg font-semibold">Bowling Statistics</h3>
+                            <div className="grid grid-cols-4 gap-4">
+                              <div className="bg-gray-200 rounded-lg p-3">
+                                <div className="text-sm text-muted-foreground">Wickets</div>
+                                <div className="text-2xl font-bold">{selectedPlayer.wickets}</div>
+                              </div>
+                              <div className="bg-gray-200 rounded-lg p-3">
+                                <div className="text-sm text-muted-foreground">Economy Rate</div>
+                                <div className="text-2xl font-bold">{selectedPlayer.economy_rate.toFixed(2)}</div>
+                              </div>
+                              <div className="bg-gray-200 rounded-lg p-3">
+                                <div className="text-sm text-muted-foreground">Overs Bowled</div>
+                                <div className="text-2xl font-bold">{selectedPlayer.overs_bowled}</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                          Wickets:
-                        </span>
-                        <div className="p-4 bg-gray-100 rounded-lg shadow-md dark:bg-gray-700">
-                          <span className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                            {selectedPlayer.wickets}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                          Overs Bowled:
-                        </span>
-                        <div className="p-4 bg-gray-100 rounded-lg shadow-md dark:bg-gray-700">
-                          <span className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                            {selectedPlayer.overs_bowled}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                          Runs Conceded:
-                        </span>
-                        <div className="p-4 bg-gray-100 rounded-lg shadow-md dark:bg-gray-700">
-                          <span className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                            {selectedPlayer.runs_conceded}
-                          </span>
+
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                        <div className="space-y-4">
+                          <h3 className="text-lg font-semibold">General Statistics</h3>
+                          <div className="grid grid-cols-4 gap-4">
+                            <div className="bg-gray-200 rounded-lg p-3">
+                              <div className="text-sm text-muted-foreground">Total Runs</div>
+                              <div className="text-2xl font-bold">{selectedPlayer.total_runs}</div>
+                            </div>
+                            <div className="bg-gray-200 rounded-lg p-3">
+                              <div className="text-sm text-muted-foreground">Balls Faced</div>
+                              <div className="text-2xl font-bold">{selectedPlayer.balls_faced}</div>
+                            </div>
+                            <div className="bg-gray-200 rounded-lg p-3">
+                              <div className="text-sm text-muted-foreground">Innings Played</div>
+                              <div className="text-2xl font-bold">{selectedPlayer.innings_played}</div>
+                            </div>
+                            <div className="bg-gray-200 rounded-lg p-3">
+                              <div className="text-sm text-muted-foreground">Wickets</div>
+                              <div className="text-2xl font-bold">{selectedPlayer.wickets}</div>
+                            </div>
+                            <div className="bg-gray-200 rounded-lg p-3">
+                              <div className="text-sm text-muted-foreground">Overs Bowled</div>
+                              <div className="text-2xl font-bold">{selectedPlayer.overs_bowled}</div>
+                            </div>
+                            <div className="bg-gray-200 rounded-lg p-3">
+                              <div className="text-sm text-muted-foreground">Runs Conceded</div>
+                              <div className="text-2xl font-bold">{selectedPlayer.runs_conceded}</div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -480,11 +541,7 @@ export default function PlayersTable() {
                       <button
                         type="button"
                         className="flex justify-center w-full px-4 py-3 text-sm font-medium text-white rounded-lg bg-red-500 shadow-theme-xs hover:bg-red-600 sm:w-auto"
-                        onClick={() => {
-                          // Logic to delete the player
-                          console.log(`Deleted player: ${selectedPlayer.name}`);
-                          closeModal();
-                        }}
+                        onClick={handleDeleteSaveChanges}
                       >
                         Delete
                       </button>

@@ -6,7 +6,6 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  PlugInIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -27,6 +26,10 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Players",
     path: "/players",
+    subItems: [
+      { name: "Add Player", path: "/players/add", pro: false },
+      { name: "View Players", path: "/players", pro: false },
+    ],
   },
   // {
   //   icon: <CalenderIcon />,
@@ -79,14 +82,14 @@ const othersItems: NavItem[] = [
   //     { name: "Videos", path: "/videos", pro: false },
   //   ],
   // },
-  {
-    icon: <PlugInIcon />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
-    ],
-  },
+  // {
+  //   icon: <PlugInIcon />,
+  //   name: "Authentication",
+  //   subItems: [
+  //     { name: "Sign In", path: "/signin", pro: false },
+  //     { name: "Sign Up", path: "/signup", pro: false },
+  //   ],
+  // },
 ];
 
 const AppSidebar: React.FC = () => {
@@ -327,7 +330,7 @@ const AppSidebar: React.FC = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
-            <div className="">
+            {/* <div className="">
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
                   !isExpanded && !isHovered
@@ -342,7 +345,7 @@ const AppSidebar: React.FC = () => {
                 )}
               </h2>
               {renderMenuItems(othersItems, "others")}
-            </div>
+            </div> */}
           </div>
         </nav>
       </div>

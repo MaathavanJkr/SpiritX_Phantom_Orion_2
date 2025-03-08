@@ -9,4 +9,10 @@ export interface Player {
     wickets: number;
     overs_bowled: number;
     runs_conceded: number;
+    points: number;
+    value: number;
+    batting_strike_rate: number;
+    batting_average: number;
+    bowling_strike_rate: number;
+    economy_rate: number;
 }
