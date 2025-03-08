@@ -21,12 +21,26 @@ var routes = []Route{
 	{Path: "/auth/register", Security: "Public", Method: "POST", Handler: handlers.UserRegister},
 
 	//user routes
-	{Path: "/user/add", Security: "Public", Method: "POST", Handler: handlers.AddUser},
-	{Path: "/user", Security: "Public", Method: "GET", Handler: handlers.GetAllUsers},
-	{Path: "/user/:id", Security: "Public", Method: "GET", Handler: handlers.GetUserByID},
-	{Path: "/user/:id", Security: "Public", Method: "PUT", Handler: handlers.UpdateUser},
-	{Path: "/user/:id", Security: "Public", Method: "DELETE", Handler: handlers.DeleteUser},
-	{Path: "/user/approve/:id", Security: "Admin", Method: "PUT", Handler: handlers.ApproveUser},
+	{Path: "/users/add", Security: "Admin", Method: "POST", Handler: handlers.AddUser},
+	{Path: "/users", Security: "Admin", Method: "GET", Handler: handlers.GetAllUsers},
+	{Path: "/users/:id", Security: "Admin", Method: "GET", Handler: handlers.GetUserByID},
+	{Path: "/users/:id", Security: "Admin", Method: "PUT", Handler: handlers.UpdateUser},
+	{Path: "/users/:id", Security: "Admin", Method: "DELETE", Handler: handlers.DeleteUser},
+	{Path: "/users/approve/:id", Security: "Admin", Method: "PUT", Handler: handlers.ApproveUser},
+
+	//player routes
+	{Path: "/players/add", Security: "Admin", Method: "POST", Handler: handlers.AddPlayer},
+	{Path: "/players", Security: "Admin", Method: "GET", Handler: handlers.GetAllPlayers},
+	{Path: "/players/:id", Security: "Admin", Method: "GET", Handler: handlers.GetPlayerByID},
+	{Path: "/players/:id", Security: "Admin", Method: "PUT", Handler: handlers.UpdatePlayer},
+	{Path: "/players/:id", Security: "Admin", Method: "DELETE", Handler: handlers.DeletePlayer},
+
+	//team routes
+	{Path: "/teams/add", Security: "Admin", Method: "POST", Handler: handlers.AddTeam},
+	{Path: "/teams", Security: "Admin", Method: "GET", Handler: handlers.GetAllTeams},
+	{Path: "/teams/:id", Security: "Admin", Method: "GET", Handler: handlers.GetTeamByID},
+	{Path: "/teams/:id", Security: "Admin", Method: "PUT", Handler: handlers.UpdateTeam},
+	{Path: "/teams/:id", Security: "Admin", Method: "DELETE", Handler: handlers.DeleteTeam},
 }
 
 func NewRouter() *gin.Engine {
