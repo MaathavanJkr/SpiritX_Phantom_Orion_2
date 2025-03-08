@@ -83,15 +83,20 @@ func GetAllPlayersByFilter(c *gin.Context) {
 		var playersForUser []models.PlayerForUser
 		for _, player := range players {
 			playersForUser = append(playersForUser, models.PlayerForUser{
-				Name:          player.Name,
-				University:    player.University,
-				Category:      player.Category,
-				TotalRuns:     player.TotalRuns,
-				BallsFaced:    player.BallsFaced,
-				InningsPlayed: player.InningsPlayed,
-				Wickets:       player.Wickets,
-				OversBowled:   player.OversBowled,
-				RunsConceded:  player.RunsConceded,
+				Name:              player.Name,
+				University:        player.University,
+				Category:          player.Category,
+				TotalRuns:         player.TotalRuns,
+				BallsFaced:        player.BallsFaced,
+				InningsPlayed:     player.InningsPlayed,
+				Wickets:           player.Wickets,
+				OversBowled:       player.OversBowled,
+				RunsConceded:      player.RunsConceded,
+				Value:             player.Value,
+				BattingStrikeRate: player.BattingStrikeRate,
+				BattingAverage:    player.BattingAverage,
+				BowingStrikeRate:  player.BowingStrikeRate,
+				EconomyRate:       player.EconomyRate,
 			})
 		}
 		c.JSON(http.StatusOK, playersForUser)
