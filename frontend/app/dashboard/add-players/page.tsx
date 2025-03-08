@@ -15,6 +15,8 @@ import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { getPlayers } from "@/services/playerService"
 import { addPlayerToTeam } from "@/services/teamService"
+import { getMyTeam, createMyTeam } from "@/services/teamService"
+import { MyTeam } from "@/types/teamTypes"
 
 export default function AddPlayersPage() {
   const [players, setPlayers] = useState<Player[]>([])
@@ -24,31 +26,46 @@ export default function AddPlayersPage() {
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [myTeam, setMyTeam] = useState<MyTeam | null>(null)
+  const [teamName, setTeamName] = useState("")
+  const [showCreateTeam, setShowCreateTeam] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    const fetchPlayers = async () => {
+    const checkTeam = async () => {
       try {
-        setIsLoading(true);
-        if (token) {
-          const data = await getPlayers();
-          setPlayers(data);
-          setFilteredPlayers(data);
-          setIsLoading(false);
+        const teamData = await getMyTeam()
+        setMyTeam(teamData)
 
+        if (teamData.is_found) {
+          // If team exists, proceed to fetch players
+          fetchPlayers()
         } else {
-          throw new Error("No auth token found");
+          // If no team, show create team UI
+          setShowCreateTeam(true)
+          setIsLoading(false)
         }
-
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch players");
-        setIsLoading(false);
+        setError(err instanceof Error ? err.message : "Failed to check team status")
+        setIsLoading(false)
       }
-    };
+    }
 
-    fetchPlayers();
-  }, []);
+    checkTeam()
+  }, [])
+
+  const fetchPlayers = async () => {
+    try {
+      setIsLoading(true)
+      const data = await getPlayers()
+      setPlayers(data)
+      setFilteredPlayers(data)
+      setIsLoading(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch players")
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
     let result = players
@@ -109,35 +126,35 @@ export default function AddPlayersPage() {
   }
 
   // Save team
-const saveTeam = async () => {
+  const saveTeam = async () => {
     const playerIds = selectedPlayers.map((player) => player.id)
-    const token = localStorage.getItem("auth_token");
-    console.log(playerIds);
-    console.log(token);
+    const token = localStorage.getItem("auth_token")
+    console.log(playerIds)
+    console.log(token)
     if (!token) {
-        toast({
-            title: "Error",
-            description: "No auth token found",
-            variant: "destructive",
-        });
-        return;
+      toast({
+        title: "Error",
+        description: "No auth token found",
+        variant: "destructive",
+      })
+      return
     }
 
     try {
-        console.log(playerIds);
-        await addPlayerToTeam(playerIds);
-        toast({
-            title: "Team saved",
-            description: `Your team of ${selectedPlayers.length} players has been saved`,
-        });
-    } catch (error : any) {
-        toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-        });
+      console.log(playerIds)
+      await addPlayerToTeam(playerIds)
+      toast({
+        title: "Team saved",
+        description: `Your team of ${selectedPlayers.length} players has been saved`,
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
     }
-}
+  }
 
   // Count players by category
   const playerCountByCategory = selectedPlayers.reduce(
@@ -147,6 +164,81 @@ const saveTeam = async () => {
     },
     {} as Record<string, number>,
   )
+
+  const handleCreateTeam = async () => {
+    if (!teamName.trim()) {
+      toast({
+        title: "Team name required",
+        description: "Please enter a name for your team",
+        variant: "destructive",
+      })
+      return
+    }
+    const userId = localStorage.getItem("user_id")
+
+    try {
+      if (!userId) {
+        toast({
+          title: "Error",
+          description: "User ID not found",
+          variant: "destructive",
+        })
+        return
+      }
+
+      await createMyTeam(teamName, Number(userId))
+      toast({
+        title: "Team created",
+        description: `Your team "${teamName}" has been created successfully`,
+      })
+
+      // Refresh team data and proceed to player selection
+      const teamData = await getMyTeam()
+      setMyTeam(teamData)
+      setShowCreateTeam(false)
+      fetchPlayers()
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to create team",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // Create team UI
+  const renderCreateTeamUI = () => {
+    return (
+      <Card className="w-full max-w-md mx-auto mt-8">
+        <CardHeader>
+          <CardTitle>Create Your Team</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>No Team Found</AlertTitle>
+            <AlertDescription>You need to create a team before you can add players.</AlertDescription>
+          </Alert> */}
+
+          <div className="space-y-2">
+            <label htmlFor="team-name" className="text-sm font-medium">
+              Team Name
+            </label>
+            <Input
+              id="team-name"
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+              placeholder="Enter your team name"
+            />
+          </div>
+
+          <Button onClick={handleCreateTeam} className="w-full">
+            Create Team
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -166,12 +258,21 @@ const saveTeam = async () => {
     )
   }
 
+  // Show create team UI if no team exists
+  if (showCreateTeam || (myTeam && !myTeam.is_found)) {
+    return renderCreateTeamUI()
+  }
+  console.log(myTeam)
   return (
     <div className="w-full space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Add Players</h1>
-        <p className="text-muted-foreground">Select players to create your team</p>
-      </div>
+      {myTeam && (
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Add Players</h1>
+          <p className="text-muted-foreground">
+            Select players for team: <span className="font-medium">{myTeam.team_name}</span>
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left Column - Available Players */}
