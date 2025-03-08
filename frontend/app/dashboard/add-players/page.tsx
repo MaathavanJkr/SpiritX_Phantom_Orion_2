@@ -170,7 +170,7 @@ export default function AddPlayersPage() {
 
       // Close dialog and redirect to summary
       setShowSaveDialog(false)
-      router.push("/dashboard/all-players")
+      router.push("/dashboard/")
     } catch (error: any) {
       toast({
         title: "Error",
@@ -500,12 +500,12 @@ export default function AddPlayersPage() {
         // View mode UI - display team members in a card
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle>Team Members</CardTitle>
-            {myTeam?.players && myTeam.players.length > 0 ? (
+            {/* <CardTitle>Team Members</CardTitle> */}
+            {/* {myTeam?.players && myTeam.players.length > 0 ? (
               <CardDescription>Your team has {myTeam.players.length} players</CardDescription>
             ) : (
               <CardDescription>You haven't added any players to your team yet</CardDescription>
-            )}
+            )} */}
           </CardHeader>
           <CardContent>
             {!myTeam?.players || myTeam.players.length === 0 ? (
@@ -520,15 +520,6 @@ export default function AddPlayersPage() {
                 {/* Category Breakdown */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
                   {categories.length > 0 &&
-                    myTeam.players.reduce(
-                      (acc, player) => {
-                        if (player.category) {
-                          acc[player.category] = (acc[player.category] || 0) + 1
-                        }
-                        return acc
-                      },
-                      {} as Record<string, number>,
-                    ) &&
                     categories.map((category) => {
                       const count = myTeam.players?.filter((p) => p.category === category).length || 0
                       return (
@@ -538,6 +529,10 @@ export default function AddPlayersPage() {
                         </div>
                       )
                     })}
+                  <div key="Total Players" className="p-2 bg-muted rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">Total Players</p>
+                    <p className="text-lg font-bold">{myTeam.players.length}</p>
+                  </div>
                 </div>
 
                 {/* Team Members List */}

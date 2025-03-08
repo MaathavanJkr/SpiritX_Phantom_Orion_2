@@ -22,28 +22,20 @@ export const createMyTeam = async (team_name: string, user_id: number): Promise<
   }
 }
 
-export const addPlayerToTeam = async (playerIds: number[]): Promise<any> => {
-  try {
-    const token = localStorage.getItem("auth_token")
-    if (!token) {
-      throw new Error("Authentication token not found")
+export const addPlayerToTeam = async (playerIds: number[]) => {
+    try {
+        console.log(playerIds)
+        console.log(typeof playerIds[0])
+        const response = await axios.post(
+            "/v1/teams/players/assign",
+            {
+                player_ids: playerIds,
+            },
+        )
+
+        return response.data
+    } catch (error: any) {
+        throw new Error(`Failed to add players to team: ${error.response?.data?.details || error.message}`)
     }
-
-    const response = await axios.post(
-      "/v1/teams/players/add",
-      {
-        player_ids: playerIds,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    )
-
-    return response.data
-  } catch (error: any) {
-    throw new Error(`Failed to add players to team: ${error.response?.data?.details || error.message}`)
-  }
 }
 
