@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { getPlayers } from "@/services/playerService"
-import { postSprite11 } from "@/services/sprit11Service"
+import { addPlayerToTeam } from "@/services/teamService"
 
 export default function AddPlayersPage() {
   const [players, setPlayers] = useState<Player[]>([])
@@ -32,7 +32,7 @@ export default function AddPlayersPage() {
       try {
         setIsLoading(true);
         if (token) {
-          const data = await getPlayers(token);
+          const data = await getPlayers();
           setPlayers(data);
           setFilteredPlayers(data);
           setIsLoading(false);
@@ -112,7 +112,8 @@ export default function AddPlayersPage() {
 const saveTeam = async () => {
     const playerIds = selectedPlayers.map((player) => player.id)
     const token = localStorage.getItem("auth_token");
-
+    console.log(playerIds);
+    console.log(token);
     if (!token) {
         toast({
             title: "Error",
@@ -123,7 +124,8 @@ const saveTeam = async () => {
     }
 
     try {
-        await postSprite11(playerIds, token);
+        console.log(playerIds);
+        await addPlayerToTeam(playerIds);
         toast({
             title: "Team saved",
             description: `Your team of ${selectedPlayers.length} players has been saved`,

@@ -1,9 +1,11 @@
 import axios from "axios";
 
+
 const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080", // Update this if your API URL is different
     headers: {
         "Content-Type": "application/json",
+        ...(typeof window !== 'undefined' && localStorage.getItem("auth_token") ? { "Authorization": `Bearer ${localStorage.getItem("auth_token")}` } : {}),
     },
 });
 

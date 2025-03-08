@@ -28,7 +28,7 @@ export function PlayersGrid() {
       try {
         setIsLoading(true);
         if (token) {
-          const data = await getPlayers(token);
+          const data = await getPlayers();
           console.log(data);
           setPlayers(data);
           setFilteredPlayers(data);
