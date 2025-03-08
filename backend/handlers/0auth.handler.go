@@ -38,7 +38,7 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	token, err := auth.GenerateJWT(user.Username, "user")
+	token, err := auth.GenerateJWT(user.Username, userInDB.Role, userInDB.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Internal server error",

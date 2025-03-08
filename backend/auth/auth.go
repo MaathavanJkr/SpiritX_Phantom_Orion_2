@@ -14,6 +14,7 @@ var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 type Claims struct {
 	Username string `json:"username"`
 	Role     string `json:"role"`
+	UserID   uint   `json:"user_id"`
 	jwt.StandardClaims
 }
 
@@ -51,6 +52,7 @@ func UserAuth() gin.HandlerFunc {
 
 		c.Set("username", claims.Username)
 		c.Set("role", claims.Role)
+		c.Set("user_id", claims.UserID)
 		c.Next()
 	}
 }

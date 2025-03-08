@@ -2,6 +2,7 @@
 package models
 
 import (
+	"fmt"
 	"go-orm-template/db"
 )
 
@@ -13,10 +14,39 @@ type Team struct {
 	Players []*Player `json:"players" gorm:"many2many:team_players;"`
 }
 
+type TeamPlayers struct {
+	UserID    uint   `json:"user_id"`
+	PlayerIDs []uint `json:"player_ids"`
+}
+
 // AddTeam creates a new team record in the database
 func AddTeam(team *Team) error {
 	result := db.ORM.Create(&team)
 	return result.Error
+}
+
+// AddPlayersToTeamByUserID adds players to a team by user ID and player IDs
+func AddPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
+	var team Team
+	result := db.ORM.Preload("Players").Where("user_id = ?", teamPlayers.UserID).First(&team)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	var players []*Player
+	result = db.ORM.Find(&players, teamPlayers.PlayerIDs)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// Check if adding the new players would exceed the maximum limit of 11 players
+	if len(team.Players)+len(players) > 11 {
+		return fmt.Errorf("adding these players would exceed the maximum limit of 11 players per team")
+	}
+
+	// Append players to the team's Players association
+	err := db.ORM.Model(&team).Association("Players").Append(players)
+	return err
 }
 
 // GetTeamByID retrieves a team record from the database by ID
