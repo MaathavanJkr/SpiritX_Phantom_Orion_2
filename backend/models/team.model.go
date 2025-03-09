@@ -67,8 +67,8 @@ func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 	totalValue := 0
 	totalPoints := 0
 	for _, player := range players {
-		totalValue += player.Value // Assuming Player struct has a Value field
-		totalPoints += player.Points
+		totalValue += *player.Value // Assuming Player struct has a Value field
+		totalPoints += *player.Points
 	}
 
 	// Check if the total value exceeds the user's budget
