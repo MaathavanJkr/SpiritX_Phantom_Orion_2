@@ -1,107 +1,3 @@
-// import { AvatarFallback } from "@/components/ui/avatar"
-// import { Avatar } from "@/components/ui/avatar"
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Overview } from "@/components/dashboard/overview"
-// import { TeamPlayers } from "@/components/dashboard/team-players"
-
-// export default function DashboardPage() {
-
-//   return (
-//     <div className="w-full space-y-6">
-//       <div>
-//         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-//         <p className="text-muted-foreground">Welcome back! Here's an overview of your team's performance.</p>
-//       </div>
-
-//       <div className="space-y-4">
-//         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-//           <Card>
-//         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//           <CardTitle className="text-sm font-medium">Total Players</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="text-2xl font-bold">24</div>
-//           <p className="text-xs text-muted-foreground">+2 from last month</p>
-//         </CardContent>
-//           </Card>
-//           <Card>
-//         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//           <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="text-2xl font-bold">68%</div>
-//           <p className="text-xs text-muted-foreground">+4% from last month</p>
-//         </CardContent>
-//           </Card>
-//           <Card>
-//         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//           <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="text-2xl font-bold">82.5</div>
-//           <p className="text-xs text-muted-foreground">+2.1 from last month</p>
-//         </CardContent>
-//           </Card>
-//           <Card>
-//         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//           <CardTitle className="text-sm font-medium">Team Ranking</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="text-2xl font-bold">3rd</div>
-//           <p className="text-xs text-muted-foreground">+2 from last month</p>
-//         </CardContent>
-//           </Card>
-//         </div>
-//         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-//           <Card className="col-span-4">
-//         <CardHeader>
-//           <CardTitle>Performance Overview</CardTitle>
-//           <CardDescription>Team performance over the last 12 months</CardDescription>
-//         </CardHeader>
-//         <CardContent className="pl-2">
-//           <Overview />
-//         </CardContent>
-//           </Card>
-//           <Card className="col-span-3">
-//         <CardHeader>
-//           <CardTitle>Top Performers</CardTitle>
-//           <CardDescription>Players with the highest stats this month</CardDescription>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="space-y-4">
-//             {[
-//           { name: "Alex Johnson", position: "Forward", score: 92 },
-//           { name: "Maria Garcia", position: "Midfielder", score: 88 },
-//           { name: "James Wilson", position: "Defender", score: 85 },
-//           { name: "Sarah Lee", position: "Forward", score: 84 },
-//           { name: "David Kim", position: "Goalkeeper", score: 82 },
-//             ].map((player) => (
-//           <div key={player.name} className="flex items-center">
-//             <Avatar className="h-9 w-9 mr-3">
-//               <AvatarFallback>
-//             {player.name
-//               .split(" ")
-//               .map((n) => n[0])
-//               .join("")}
-//               </AvatarFallback>
-//             </Avatar>
-//             <div className="space-y-1 flex-1">
-//               <p className="text-sm font-medium leading-none">{player.name}</p>
-//               <p className="text-xs text-muted-foreground">{player.position}</p>
-//             </div>
-//             <div className="font-medium">{player.score}</div>
-//           </div>
-//             ))}
-//           </div>
-//         </CardContent>
-//           </Card>
-//         </div>
-//       </div>
-
-//     </div>
-//   )
-// }
 
 "use client"
 
@@ -111,25 +7,64 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Trophy, AlertCircle, Medal, User } from "lucide-react"
+import { Trophy, AlertCircle, Medal, User, Award, Crown} from "lucide-react"
 import type { MyTeam } from "@/types/teamTypes"
 import { getMyTeam } from "@/services/teamService"
-import { TopScorers } from "@/types/playerTypes"
+import { Leaderboard, TopScorers } from "@/types/leaderboardType"
 import { getTopScorers } from "@/services/playerService"
+import { getLeaderBoard } from "@/services/leaderboardService"
+import { CartesianGrid, ResponsiveContainer, BarChart, XAxis, YAxis, Tooltip, Bar, Cell, PieChart, Pie } from "recharts"
+import {
+  TrendingUp,
+  Users,
+  BarChart3,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react"
 
 export default function LeaderboardDashboard() {
   const [topScorers, setTopScorers] = useState<TopScorers | null>(null)
   const [myTeam, setMyTeam] = useState<MyTeam | null>(null)
+  const [leaderboard, setLeaderboard] = useState<Leaderboard[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [currentUserPoints, setCurrentUserPoints] = useState<number | null>(null)
+  const [currentUserRank, setCurrentUserRank] = useState<number | null>(null)
+  const [currentUserTeam, setCurrentUserTeam] = useState<Leaderboard | null>(null)
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const [scorersData, teamData] = await Promise.all([getTopScorers(), getMyTeam()])
+        const [scorersData, teamData, leaderboardData] = await Promise.all([
+          getTopScorers(),
+          getMyTeam(),
+          getLeaderBoard(),
+        ])
+
         setTopScorers(scorersData)
         setMyTeam(teamData)
+        setLeaderboard(leaderboardData)
+
+        // Get current user ID from localStorage
+        const userId = localStorage.getItem("user_id")
+        if (userId) {
+          const userIdNum = Number.parseInt(userId)
+
+          // Find current user's team in leaderboard
+          const userTeam = leaderboardData.find((team: { user_id: number }) => team.user_id === userIdNum)
+          if (userTeam) {
+            setCurrentUserPoints(userTeam.points)
+            setCurrentUserTeam(userTeam)
+
+            // Calculate user's rank
+            const rank =
+              leaderboardData.sort((a: { points: number }, b: { points: number }) => b.points - a.points).findIndex((team: { user_id: number }) => team.user_id === userIdNum) + 1
+            setCurrentUserRank(rank)
+          }
+        }
+
         setIsLoading(false)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch data")
@@ -180,139 +115,286 @@ export default function LeaderboardDashboard() {
         return "text-muted-foreground"
     }
   }
+  // Sort leaderboard by points
+  const sortedLeaderboard = [...leaderboard].sort((a, b) => b.points - a.points)
+  // Sort leaderboard by points and get top 3
+  const top3Teams = [...leaderboard].sort((a, b) => b.points - a.points).slice(0, 3)
+
+  // Chart colors
+  const pieChartColors = ["#4394E5", "#F8AE54", "#CB6A6E9", "#E0E0E0", "#876FD4"]
+
+  const categoryDistribution =
+    currentUserTeam?.players.reduce(
+      (acc, player) => {
+        const category = player.category || "Unknown"
+        acc[category] = (acc[category] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    ) || {}
+
+  // Format for pie chart
+  const categoryPieData = Object.entries(categoryDistribution).map(([name, value]) => ({
+    name,
+    value,
+  }))
+
+  // Calculate points difference from the team above
+  const getPointsDifference = (rank: number) => {
+    if (rank <= 1 || !currentUserRank) return null
+    const teamAbove = sortedLeaderboard[currentUserRank - 2] // -1 for 0-index, -1 for team above
+    const currentTeam = sortedLeaderboard[currentUserRank - 1] // -1 for 0-index
+
+    if (!teamAbove || !currentTeam) return null
+    return teamAbove.points - currentTeam.points
+  }
+
+  const pointsDifference = getPointsDifference(currentUserRank || 0)
+
+  // Calculate average points
+  const averagePoints =
+    leaderboard.length > 0 ? leaderboard.reduce((sum, team) => sum + team.points, 0) / leaderboard.length : 0
+
+  // Calculate if user is above or below average
+  const pointsVsAverage = currentUserPoints !== null ? currentUserPoints - averagePoints : null
 
   return (
     <div className="w-full space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Leaderboard</h1>
-        {myTeam && myTeam.is_found && (
-          <p className="text-muted-foreground">
-            Your team: <span className="font-medium">{myTeam.team_name}</span>
-          </p>
-        )}
-      </div>
+      {/* User's Team Stats */}
+      {currentUserTeam && currentUserPoints !== null && currentUserRank !== null && (
+        <div className="grid gap-6 md:grid-cols-3">
+          <Card className="md:col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-primary" />
+                Your Team Performance
+              </CardTitle>
+              <CardDescription>{myTeam?.team_name || currentUserTeam.name}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                <div className="flex flex-col items-center">
+                  <div className="text-5xl font-bold text-primary">{currentUserPoints}</div>
+                  <div className="text-sm text-muted-foreground mt-1">Total Points</div>
+
+                  <div className="mt-4 flex items-center gap-1">
+                    <Medal className={`h-5 w-5 ${getMedalColor(currentUserRank - 1)}`} />
+                    <span className="text-xl font-semibold">
+                      Rank: {currentUserRank}
+                      {getOrdinalSuffix(currentUserRank)}
+                    </span>
+                  </div>
+                </div>
+
+                <Separator orientation="vertical" className="h-24 hidden md:block" />
+
+                <div className="space-y-4 flex-1">
+                  {pointsDifference !== null && (
+                    <div className="flex items-center gap-2">
+                      <ArrowUp className="h-5 w-5 text-primary" />
+                      <div>
+                        <div className="text-sm text-muted-foreground">Points needed for next rank</div>
+                        <div className="font-medium">{pointsDifference + 1} points</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {pointsVsAverage !== null && (
+                    <div className="flex items-center gap-2">
+                      {pointsVsAverage >= 0 ? (
+                        <TrendingUp className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <ArrowDown className="h-5 w-5 text-red-500" />
+                      )}
+                      <div>
+                        <div className="text-sm text-muted-foreground">Compared to average</div>
+                        <div className={`font-medium ${pointsVsAverage >= 0 ? "text-green-600" : "text-red-600"}`}>
+                          {pointsVsAverage >= 0 ? "+" : ""}
+                          {pointsVsAverage.toFixed(1)} points
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1">
+                  <div className="text-sm font-medium mb-2">Team Composition</div>
+                  {Object.entries(categoryDistribution).map(([category, count]) => (
+                    <div key={category} className="flex items-center justify-between mb-1">
+                      <span className="text-sm">{category}s:</span>
+                      <Badge variant="outline">{count}</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-primary" />
+                Team Composition
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px]">
+                {categoryPieData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={categoryPieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
+                        {categoryPieData.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={pieChartColors[index % pieChartColors.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => [`${value} players`, "Count"]} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-muted-foreground">No player data available</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Overall Stats Card */}
+
+      {/* Top 3 Teams Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Crown className="h-5 w-5 text-yellow-500" />
+            Top Teams
+          </CardTitle>
+          <CardDescription>Teams with the highest points</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {top3Teams.length > 0 ? (
+            <div>
+              <div className="mt-6 space-y-4">
+                {top3Teams.map((team, index) => (
+                  <div key={team.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-full bg-muted ${getMedalColor(index)}`}
+                      >
+                        <Medal className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{team.name}</p>
+                        <p className="text-sm text-muted-foreground">{team.user.username}</p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-base px-3 py-1">
+                      {team.points} points
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-muted-foreground">No leaderboard data available</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-6 md:grid-cols-1">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-primary" />
-              Overall Tournament Stats
-            </CardTitle>
-            <CardDescription>Current tournament statistics</CardDescription>
+          <CardHeader>
+            <CardTitle>Highest Run Scorers</CardTitle>
+            <CardDescription>Players with the most runs in the tournament</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg border p-3 text-center">
-                <p className="text-sm font-medium text-muted-foreground">Total Runs</p>
-                <p className="text-2xl font-bold">{topScorers.overall_runs}</p>
-              </div>
-              <div className="rounded-lg border p-3 text-center">
-                <p className="text-sm font-medium text-muted-foreground">Total Wickets</p>
-                <p className="text-2xl font-bold">{topScorers.overall_wickets}</p>
-              </div>
+            <div className="space-y-4">
+              {topScorers.highest_run_scorers.map((batsman, index) => (
+                <div key={batsman.id}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-full bg-muted ${getMedalColor(index)}`}
+                      >
+                        {index <= 2 ? <Medal className="h-5 w-5" /> : <span className="font-bold">{index + 1}</span>}
+                      </div>
+                      <div>
+                        <p className="font-medium">{batsman.name}</p>
+                        <Badge variant="outline" className="mt-1">
+                          {batsman.runs} runs
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  {index < topScorers.highest_run_scorers.length - 1 && <Separator className="my-3" />}
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Team Card - If you want to show more team info */}
-        {myTeam && myTeam.is_found && (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-primary" />
-                My Team
-              </CardTitle>
-              <CardDescription>Your team performance</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center justify-center h-full py-6">
-                <h3 className="text-2xl font-bold">{myTeam.team_name}</h3>
-                <p className="text-muted-foreground mt-2">
-                  {myTeam.players ? `${myTeam.players.length} players` : "No players added yet"}
-                </p>
-                {/* You can add more team stats here if available */}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Highest Wicket Takers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {topScorers.highest_wicket_takers.map((bowler, index) => (
+                <div key={bowler.id}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-full bg-muted ${getMedalColor(index)}`}
+                      >
+                        {index <= 2 ? <Medal className="h-5 w-5" /> : <span className="font-bold">{index + 1}</span>}
+                      </div>
+                      <div>
+                        <p className="font-medium">{bowler.name}</p>
+                        <Badge variant="outline" className="mt-1">
+                          {bowler.wickets} wickets
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  {index < topScorers.highest_wicket_takers.length - 1 && <Separator className="my-3" />}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       </div>
 
-      {/* Leaderboard Tabs */}
-      <Tabs defaultValue="batsmen" className="pb-3">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="batsmen">Top Batsmen</TabsTrigger>
-          <TabsTrigger value="bowlers">Top Bowlers</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="batsmen" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Highest Run Scorers</CardTitle>
-              <CardDescription>Players with the most runs in the tournament</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {topScorers.highest_run_scorers.map((batsman, index) => (
-                  <div key={batsman.id}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex items-center justify-center w-8 h-8 rounded-full bg-muted ${getMedalColor(index)}`}
-                        >
-                          {index <= 2 ? <Medal className="h-5 w-5" /> : <span className="font-bold">{index + 1}</span>}
-                        </div>
-                        <div>
-                          <p className="font-medium">{batsman.name}</p>
-                          <Badge variant="outline" className="mt-1">
-                            {batsman.runs} runs
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    {index < topScorers.highest_run_scorers.length - 1 && <Separator className="my-3" />}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="bowlers" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Highest Wicket Takers</CardTitle>
-              <CardDescription>Players with the most wickets in the tournament</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {topScorers.highest_wicket_takers.map((bowler, index) => (
-                  <div key={bowler.id}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex items-center justify-center w-8 h-8 rounded-full bg-muted ${getMedalColor(0)}`}
-                        >
-                          {index <= 2 ? <Medal className="h-5 w-5" /> : <span className="font-bold">{index + 1}</span>}
-                        </div>
-                        <div>
-                          <p className="font-medium">{bowler.name}</p>
-                          <Badge variant="outline" className="mt-1">
-                            {bowler.wickets} wickets
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    {index < topScorers.highest_wicket_takers.length - 1 && <Separator className="my-3" />}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      
     </div>
   )
 }
+
+// Helper function to get ordinal suffix for numbers (1st, 2nd, 3rd, etc.)
+function getOrdinalSuffix(num: number): string {
+  const j = num % 10
+  const k = num % 100
+
+  if (j === 1 && k !== 11) {
+    return "st"
+  }
+  if (j === 2 && k !== 12) {
+    return "nd"
+  }
+  if (j === 3 && k !== 13) {
+    return "rd"
+  }
+  return "th"
+}
+

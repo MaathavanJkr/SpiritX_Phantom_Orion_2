@@ -1,5 +1,6 @@
-import { Player, TopScorers } from '@/types/playerTypes';
+import { Player} from '@/types/playerTypes';
 import axios from '../axios.config';
+import { TopScorers } from "@/types/leaderboardType"
 
 export const getPlayers = async (): Promise<Player[]> => {
     try {

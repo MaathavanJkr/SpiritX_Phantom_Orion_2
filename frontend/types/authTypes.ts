@@ -4,6 +4,7 @@ export interface User {
     role: string;
     created_at: string;
     approved: boolean;
+    budget: number;
   }
 
 export interface LoginResponse {

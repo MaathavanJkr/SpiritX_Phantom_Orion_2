@@ -233,8 +233,6 @@ export default function AddPlayersPage() {
 
   const toggleEditMode = () => {
     setIsEditMode(!isEditMode)
-
-    // If canceling edit mode, reset selected players to original team players
     if (isEditMode && myTeam?.players) {
       setSelectedPlayers(myTeam.players)
     }
@@ -401,8 +399,13 @@ export default function AddPlayersPage() {
                             <p className="font-medium">{player.name}</p>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <span>{player.university}</span>
-                              <span>•</span>
-                              <Badge variant="outline">{player.category}</Badge>
+                              <span></span>
+                            </div>
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Badge variant="outline">{player.category}</Badge>
+                                <span>Price</span>
+                                <span>:</span>
+                              <span className="font-bold text-black">{player.value}</span>
                             </div>
                           </div>
                         </div>

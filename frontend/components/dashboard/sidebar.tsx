@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-import { Home, Users, BarChart2, Settings, HelpCircle, Trophy } from "lucide-react"
+import { Home, Users, ChartNoAxesColumn, Settings, HelpCircle, Trophy } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -20,7 +20,7 @@ export default function DashboardSidebar() {
     { icon: Home, label: "Home", href: "/dashboard" },
     { icon: Users, label: "All Players", href: "/dashboard/all-players" },    
     { icon: Trophy, label: "Spirit 11", href: "/dashboard/add-players" },
-    { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+    { icon: ChartNoAxesColumn, label: "Leaderboard", href: "/dashboard/leaderboard" },
   ]
 
   return (

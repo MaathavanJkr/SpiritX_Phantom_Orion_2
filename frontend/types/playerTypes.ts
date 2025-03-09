@@ -9,6 +9,7 @@ export interface Player {
     wickets: number;
     overs_bowled: number;
     runs_conceded: number;
+    value: number;
 }
 
 export interface Batsman {
@@ -23,9 +24,3 @@ export interface Bowler {
     wickets: number;
 }
 
-export interface TopScorers {
-    overall_runs: number;
-    overall_wickets: number;
-    highest_run_scorers: Batsman[];
-    highest_wicket_takers: Bowler[];
-}

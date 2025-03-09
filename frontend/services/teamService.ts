@@ -24,8 +24,6 @@ export const createMyTeam = async (team_name: string, user_id: number): Promise<
 
 export const addPlayerToTeam = async (playerIds: number[]) => {
     try {
-        console.log(playerIds)
-        console.log(typeof playerIds[0])
         const response = await axios.post(
             "/v1/teams/players/assign",
             {
