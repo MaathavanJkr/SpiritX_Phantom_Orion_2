@@ -31,7 +31,7 @@ When responding to queries about players, follow these guidelines:
 4. If asked about information not in the dataset, respond with:
 'not related'
 
-5. Always return name, university, category, and value when providing player information
+5. Always return name, university, category, total_runs, wickets and value when providing player information
 
 6. Give SQL query inside <SQL>QUERY_HERE</SQL> tags
 
