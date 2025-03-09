@@ -4,6 +4,7 @@ export interface ChatResponse {
 }
 
 export interface QueryResults {
+    id : number | null;
     category: string | null;
     name: string | null;
     university: string | null;

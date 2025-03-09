@@ -12,11 +12,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
-import { useToast } from "@/hooks/use-toast"
 import { getPlayers } from "@/services/playerService"
 import { addPlayerToTeam } from "@/services/teamService"
 import { getMyTeam, createMyTeamName } from "@/services/teamService"
 import type { MyTeam } from "@/types/teamTypes"
+
+import { ToastContainer, toast } from 'react-toastify';
 
 import { useRouter } from "next/navigation"
 import {
@@ -43,7 +44,6 @@ export default function AddPlayersPage() {
   const [teamName, setTeamName] = useState("")
   const [showCreateTeam, setShowCreateTeam] = useState(false)
   const [showSaveDialog, setShowSaveDialog] = useState(false)
-  const { toast } = useToast()
   const [isEditMode, setIsEditMode] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [availableBudget, setAvailableBudget] = useState<number>(0)
@@ -148,76 +148,50 @@ export default function AddPlayersPage() {
   // Add player to selection
   const addPlayer = (player: Player) => {
     if (selectedPlayers.length >= 11) {
-      toast({
-        title: "Team is full",
-        description: "You can only select up to 11 players",
-        variant: "destructive",
-      })
+      toast.error("Team is full, You can only select up to 11 players")
       return
     }
 
     if (selectedPlayers.some((p) => p.id === player.id)) {
-      toast({
-        title: "Player already selected",
-        description: "This player is already in your team",
-        variant: "destructive",
-      })
+      toast.error("This player is already in your team")
       return
     }
 
     // Check if adding this player would exceed budget
     const playerCost = player.value || 0
     if (availableBudget - playerCost < 0) {
-      toast({
-        title: "Budget exceeded",
-        description: `Adding ${player.name} would exceed your available budget by ${Math.abs(availableBudget - playerCost)}`,
-        variant: "destructive",
-      })
+      toast.error(`Adding ${player.name} would exceed your available budget by ${Math.abs(availableBudget - playerCost)}`)
       return
     }
 
     setSelectedPlayers([...selectedPlayers, player])
-    toast({
-      title: "Player added",
-      description: `${player.name} has been added to your team`,
-    })
-  }
+    toast.success(`${player.name} has been added to your team`)
+    }
 
-  // Remove player from selection
-  const removePlayer = (playerId: number) => {
+    // Remove player from selection
+    const removePlayer = (playerId: number) => {
     const playerToRemove = selectedPlayers.find((p) => p.id === playerId)
     setSelectedPlayers(selectedPlayers.filter((p) => p.id !== playerId))
 
     if (playerToRemove) {
-      toast({
-        title: "Player removed",
-        description: `${playerToRemove.name} has been removed from your team`,
-      })
+      toast.success(`${playerToRemove.name} has been removed from your team`)
     }
-  }
+    }
 
-  // Open save dialog
-  const handleSaveClick = () => {
+    // Open save dialog
+    const handleSaveClick = () => {
     if (isBudgetExceeded) {
-      toast({
-        title: "Budget exceeded",
-        description: "You cannot save the team because you've exceeded your budget",
-        variant: "destructive",
-      })
+      toast.error("You cannot save the team because you've exceeded your budget")
       return
     }
 
     setShowSaveDialog(true)
-  }
+    }
 
-  // Save team
-  const saveTeam = async () => {
+    // Save team
+    const saveTeam = async () => {
     if (isBudgetExceeded) {
-      toast({
-        title: "Budget exceeded",
-        description: "You cannot save the team because you've exceeded your budget",
-        variant: "destructive",
-      })
+      toast.error("You cannot save the team because you've exceeded your budget")
       setShowSaveDialog(false)
       return
     }
@@ -226,51 +200,36 @@ export default function AddPlayersPage() {
 
     try {
       await addPlayerToTeam(playerIds)
-      toast({
-        title: "Team saved",
-        description: `Your team of ${selectedPlayers.length} players has been saved`,
-      })
+      toast.success(`Your team of ${selectedPlayers.length} players has been saved`)
       console.log("Team saved successfully")
       setIsEditMode(!isEditMode)
 
       setShowSaveDialog(false)
-    //   router.push("/dashboard/leaderboard")
       window.location.reload() // Hard refresh
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      })
+      toast.error(error.message)
       setShowSaveDialog(false)
     }
-  }
+    }
 
-  // Count players by category
-  const playerCountByCategory = selectedPlayers.reduce(
+    // Count players by category
+    const playerCountByCategory = selectedPlayers.reduce(
     (acc, player) => {
       acc[player.category] = (acc[player.category] || 0) + 1
       return acc
     },
     {} as Record<string, number>,
-  )
+    )
 
-  const handleCreateTeam = async () => {
+    const handleCreateTeam = async () => {
     if (!teamName.trim()) {
-      toast({
-        title: "Team name required",
-        description: "Please enter a name for your team",
-        variant: "destructive",
-      })
+      toast.error("Please enter a name for your team")
       return
     }
 
     try {
       await createMyTeamName(teamName)
-      toast({
-        title: "Team created",
-        description: `Your team "${teamName}" has been created successfully`,
-      })
+      toast.success(`Your team "${teamName}" has been created successfully`)
 
       // Refresh team data and proceed to player selection
       const teamData = await getMyTeam()
@@ -278,13 +237,9 @@ export default function AddPlayersPage() {
       setShowCreateTeam(false)
       fetchPlayers()
     } catch (err) {
-      toast({
-        title: "Error",
-        description: err instanceof Error ? err.message : "Failed to create team",
-        variant: "destructive",
-      })
+      toast.error(err instanceof Error ? err.message : "Failed to create team")
     }
-  }
+    }
 
   const toggleEditMode = () => {
     setIsEditMode(!isEditMode)
@@ -523,7 +478,7 @@ export default function AddPlayersPage() {
                   <CardTitle>Your Team ({selectedPlayers.length}/11)</CardTitle>
                   <Button 
                     onClick={handleSaveClick} 
-                    disabled={selectedPlayers.length === 0 || isBudgetExceeded}
+                    disabled={selectedPlayers.length > 11 || isBudgetExceeded}
                     variant={isBudgetExceeded ? "destructive" : "default"}
                   >
                     <Save className="h-4 w-4 mr-2" />
@@ -693,6 +648,11 @@ export default function AddPlayersPage() {
         </Card>
 
       )}
+      <ToastContainer 
+      position="bottom-right"
+      autoClose={2000}
+      theme="colored"
+      />
     </div>
   )
 }

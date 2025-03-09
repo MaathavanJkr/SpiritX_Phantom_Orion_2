@@ -50,7 +50,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       localStorage.setItem("user_role", response.user.role)
       localStorage.setItem("user_name", response.user.username)
       localStorage.setItem("user_id", response.user.id.toString())
-      router.push("/dashboard")
+      if (localStorage.getItem("auth_token")) {
+        alert("Login successful! Redirecting to dashboard...");
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000);
+      } 
     } catch (error) {
       setLoginError("Invalid username or password. Please try again.")
     } finally {

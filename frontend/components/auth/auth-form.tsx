@@ -102,7 +102,6 @@ export default function AuthForm() {
   
     try {
       const response = await login(values.username, values.password);
-      localStorage.setItem("auth_token", response.token);
       localStorage.setItem("user_role", response.user.role);
       localStorage.setItem("user_name", response.user.username);
       localStorage.setItem("user_id", response.user.id.toString());

@@ -19,3 +19,11 @@ export const getTopScorers = async (): Promise<TopScorers> => {
         throw new Error(`Failed to get top scorers: ${error.response?.data?.details || error.message}`);
     }
 }
+export const getPlayerDetails = async (id: number): Promise<Player> => {
+    try {
+        const response = await axios.get(`/v1/players/${id}`);
+        return response.data;
+    } catch (error: any) {
+        throw new Error(`Failed to get player details: ${error.response?.data?.details || error.message}`);
+    }
+}
