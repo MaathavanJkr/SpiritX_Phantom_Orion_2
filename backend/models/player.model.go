@@ -3,6 +3,7 @@ package models
 
 import (
 	"go-orm-template/db"
+	"math"
 )
 
 type Player struct {
@@ -50,10 +51,10 @@ type PlayerForUser struct {
 }
 
 func CalculatePlayerStats(player *Player) {
-	player.BattingStrikeRate = float64(player.TotalRuns) / float64(player.BallsFaced) * 100
-	player.BattingAverage = float64(player.TotalRuns) / float64(player.InningsPlayed)
-	player.BowingStrikeRate = float64(player.OversBowled) / float64(player.Wickets)
-	player.EconomyRate = float64(player.RunsConceded) / float64(player.OversBowled*6)
+	player.BattingStrikeRate = math.Round((float64(player.TotalRuns)/float64(player.BallsFaced)*100)*100) / 100
+	player.BattingAverage = math.Round((float64(player.TotalRuns)/float64(player.InningsPlayed))*100) / 100
+	player.BowingStrikeRate = math.Round((float64(player.OversBowled)/float64(player.Wickets))*100) / 100
+	player.EconomyRate = math.Round((float64(player.RunsConceded)/float64(player.OversBowled*6))*100) / 100
 
 	player.Points = int((player.BattingStrikeRate/5 + player.BattingAverage*0.8 + (500 / player.BowingStrikeRate) + (140 / player.EconomyRate)))
 	player.Value = int((9*float64(player.Points) + 100) * 1000)

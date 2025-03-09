@@ -19,6 +19,9 @@ var routes = []Route{
 	//Auth routes
 	{Path: "/auth/login", Security: "Public", Method: "POST", Handler: handlers.UserLogin},
 	{Path: "/auth/register", Security: "Public", Method: "POST", Handler: handlers.UserRegister},
+	{Path: "/auth/admin/login", Security: "Public", Method: "POST", Handler: handlers.AdminLogin},
+	{Path: "/auth/validate", Security: "User", Method: "GET", Handler: handlers.ValidateToken},
+	{Path: "/auth/validate/admin", Security: "Admin", Method: "GET", Handler: handlers.ValidateToken},
 
 	//user routes
 	{Path: "/users/add", Security: "User", Method: "POST", Handler: handlers.AddUser},
@@ -49,6 +52,7 @@ var routes = []Route{
 
 	{Path: "/v1/teams/players/assign", Security: "User", Method: "POST", Handler: handlers.AssingPlayersToTeamByUserID},
 	{Path: "/v1/teams/my", Security: "User", Method: "GET", Handler: handlers.GetTeamPlayersViewForUser},
+	{Path: "/v1/teams/leaderboard", Security: "User", Method: "GET", Handler: handlers.GetTeamLeaderBoard},
 }
 
 func NewRouter() *gin.Engine {
