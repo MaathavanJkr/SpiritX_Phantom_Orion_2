@@ -22,7 +22,7 @@ type Player struct {
 	Value             *int     `json:"value"`
 	BattingStrikeRate *float64 `json:"batting_strike_rate"`
 	BattingAverage    *float64 `json:"batting_average"`
-	BowingStrikeRate  *float64 `json:"bowling_strike_rate"`
+	BowlingStrikeRate *float64 `json:"bowling_strike_rate"`
 	EconomyRate       *float64 `json:"economy_rate"`
 }
 
@@ -47,7 +47,7 @@ type PlayerForUser struct {
 	Value             *int     `json:"value"`
 	BattingStrikeRate *float64 `json:"batting_strike_rate"`
 	BattingAverage    *float64 `json:"batting_average"`
-	BowingStrikeRate  *float64 `json:"bowling_strike_rate"`
+	BowlingStrikeRate *float64 `json:"bowling_strike_rate"`
 	EconomyRate       *float64 `json:"economy_rate"`
 }
 
@@ -70,9 +70,9 @@ func CalculatePlayerStats(player *Player) {
 	}
 
 	if math.IsNaN(bowlingStrikeRate) {
-		player.BowingStrikeRate = nil
+		player.BowlingStrikeRate = nil
 	} else {
-		player.BowingStrikeRate = &bowlingStrikeRate
+		player.BowlingStrikeRate = &bowlingStrikeRate
 	}
 
 	if math.IsNaN(economyRate) {
@@ -89,8 +89,8 @@ func CalculatePlayerStats(player *Player) {
 		points += int(float64(*player.BattingAverage) * 0.8)
 	}
 
-	if player.BowingStrikeRate != nil && *player.BowingStrikeRate > 0 {
-		points += int(safeDivide(500.0, float64(*player.BowingStrikeRate)))
+	if player.BowlingStrikeRate != nil && *player.BowlingStrikeRate > 0 {
+		points += int(safeDivide(500.0, float64(*player.BowlingStrikeRate)))
 	}
 
 	if player.EconomyRate != nil && *player.EconomyRate > 0 {
@@ -115,7 +115,7 @@ func CalculatePlayerStats(player *Player) {
 		player.BattingAverage = &roundedBattingAverage
 	}
 	if !math.IsNaN(roundedBowlingStrikeRate) {
-		player.BowingStrikeRate = &roundedBowlingStrikeRate
+		player.BowlingStrikeRate = &roundedBowlingStrikeRate
 	}
 	if !math.IsNaN(roundedEconomyRate) {
 		player.EconomyRate = &roundedEconomyRate
