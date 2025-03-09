@@ -2,13 +2,35 @@
 ## Usage
 To start using Spirit11, follow these steps:
 
-### Frontend
-1. **Install React:**
+
+### Frontend User
+1. **Navigate to the frontend directory:**
+    ```bash
+    cd frontend
+    ```
+
+2. **Install React:**
     ```bash
     npm install
     ```
 
-2. **Run the frontend application:**
+3. **Run the frontend application:**
+    ```bash
+    npm run dev
+    ```
+
+### Frontend Admin
+1. **Navigate to the admin directory:**
+    ```bash
+    cd admin
+    ```
+
+2. **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3. **Run the admin frontend application:**
     ```bash
     npm run dev
     ```
@@ -20,9 +42,13 @@ To start using Spirit11, follow these steps:
 2. **Install Go:**
     Ensure Go is installed on your system. If not, download and install it from [golang.org](https://golang.org/).
 
-3. **Run the backend application:**
+3. **Install the required dependencies:**
     ```bash
-    go mod tidy
+    go mod download
+    ```
+
+4. **Run the backend application:**
+    ```bash
     go run .
     ```
 
