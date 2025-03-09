@@ -17,6 +17,14 @@ type User struct {
 	Budget   int    `json:"budget"`
 }
 
+type MyProfile struct {
+	Name            string `json:"name"`
+	Username        string `json:"username"`
+	Budget          int    `json:"budget"`
+	AvailableBudget int    `json:"available_budget"`
+	TeamName        string `json:"team_name"`
+}
+
 type UserWithPassword struct {
 	User
 	Password string `json:"password"`

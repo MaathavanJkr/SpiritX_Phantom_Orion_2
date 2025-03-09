@@ -30,6 +30,8 @@ var routes = []Route{
 	{Path: "/users/:id", Security: "Admin", Method: "PUT", Handler: handlers.UpdateUser},
 	{Path: "/users/:id", Security: "Admin", Method: "DELETE", Handler: handlers.DeleteUser},
 
+	{Path: "/v1/users/my", Security: "User", Method: "GET", Handler: handlers.GetMyProfile},
+
 	//player routes
 	{Path: "/players/add", Security: "Admin", Method: "POST", Handler: handlers.AddPlayer},
 	{Path: "/players", Security: "Admin", Method: "GET", Handler: handlers.GetAllPlayers},
@@ -39,10 +41,10 @@ var routes = []Route{
 	{Path: "/players/filter", Security: "Admin", Method: "GET", Handler: handlers.GetAllPlayersByFilter},
 
 	{Path: "/v1/players/filter", Security: "User", Method: "GET", Handler: handlers.GetAllPlayersByFilter},
+	{Path: "/v1/players/:id", Security: "User", Method: "GET", Handler: handlers.GetPlayerByIDForUser},
 
 	//Touranment routes
 	{Path: "/tournament/summary", Security: "Admin", Method: "GET", Handler: handlers.GetTournamentSummary},
-
 	{Path: "/v1/tournament/summary", Security: "User", Method: "GET", Handler: handlers.GetTournamentSummary},
 
 	//team routes
@@ -56,7 +58,6 @@ var routes = []Route{
 	{Path: "/v1/teams/my", Security: "User", Method: "GET", Handler: handlers.GetMyTeam},
 	{Path: "/v1/teams/my", Security: "User", Method: "PUT", Handler: handlers.UpdateMyTeam},
 	{Path: "/v1/teams/leaderboard", Security: "User", Method: "GET", Handler: handlers.GetTeamLeaderBoard},
-	{Path: "/v1/teams/myteamvalue", Security: "User", Method: "GET", Handler: handlers.GetTeamLeaderBoard},
 }
 
 func NewRouter() *gin.Engine {

@@ -37,6 +37,34 @@ func GetPlayerByID(c *gin.Context) {
 	c.JSON(http.StatusOK, player)
 }
 
+func GetPlayerByIDForUser(c *gin.Context) {
+	id := c.Param("id")
+	player, err := models.GetPlayerByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	playerForUser := models.PlayerForUser{
+		Name:              player.Name,
+		University:        player.University,
+		Category:          player.Category,
+		TotalRuns:         player.TotalRuns,
+		BallsFaced:        player.BallsFaced,
+		InningsPlayed:     player.InningsPlayed,
+		Wickets:           player.Wickets,
+		OversBowled:       player.OversBowled,
+		RunsConceded:      player.RunsConceded,
+		Value:             player.Value,
+		BattingStrikeRate: player.BattingStrikeRate,
+		BattingAverage:    player.BattingAverage,
+		BowingStrikeRate:  player.BowingStrikeRate,
+		EconomyRate:       player.EconomyRate,
+	}
+
+	c.JSON(http.StatusOK, playerForUser)
+}
+
 func GetAllPlayers(c *gin.Context) {
 	players, err := models.GetAllPlayers()
 	if err != nil {
