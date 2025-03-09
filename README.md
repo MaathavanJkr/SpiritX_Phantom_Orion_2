@@ -1,6 +1,4 @@
 # Spirit11
-
-# Spirit11
 ## Usage
 To start using Spirit11, follow these steps:
 
