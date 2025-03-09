@@ -34,7 +34,7 @@ To start using Spirit11, follow these steps:
     Create a `.env` file in the root directory and add the necessary environment variables. 
 
     ```plaintext
-    NEXT_PUBLIC_BACKEND_URL=http://localhost
+    NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
     ```
 
 3. **Install React:**
