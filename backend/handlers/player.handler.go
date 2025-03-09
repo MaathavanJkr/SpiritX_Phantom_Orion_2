@@ -46,6 +46,7 @@ func GetPlayerByIDForUser(c *gin.Context) {
 	}
 
 	playerForUser := models.PlayerForUser{
+		ID:                player.ID,
 		Name:              player.Name,
 		University:        player.University,
 		Category:          player.Category,
@@ -111,6 +112,7 @@ func GetAllPlayersByFilter(c *gin.Context) {
 		var playersForUser []models.PlayerForUser
 		for _, player := range players {
 			playersForUser = append(playersForUser, models.PlayerForUser{
+				ID:                player.ID,
 				Name:              player.Name,
 				University:        player.University,
 				Category:          player.Category,

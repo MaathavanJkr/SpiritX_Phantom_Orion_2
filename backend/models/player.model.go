@@ -34,6 +34,7 @@ type TournamentSummary struct {
 }
 
 type PlayerForUser struct {
+	ID                uint    `json:"id"`
 	Name              string  `json:"name"`
 	University        string  `json:"university"`
 	Category          string  `json:"category"`
