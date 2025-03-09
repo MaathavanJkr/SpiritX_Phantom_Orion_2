@@ -5,7 +5,7 @@ To start using Spirit11, follow these steps:
 
 ### Backend
 1. **Set up environment variables:**
-    Create a `.env` file in the root directory and add the necessary environment variables. Refer to `.env.example` for the required variables.
+    Create a `.env` file in the root directory and add the necessary environment variables. Refer to `.env.example` for the required variables. To access the already imported data use the .env file in the drive folder and can be connected straight to cloud database.
 
 2. **Install Go:**
     Ensure Go is installed on your system. If not, download and install it from [golang.org](https://golang.org/).
