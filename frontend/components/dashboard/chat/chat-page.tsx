@@ -54,8 +54,10 @@ export default function ChatPage() {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response.is_player
-          ? `PLAYER_CARD:${JSON.stringify(response.query_results?.[0])}SUMMARY:${response.explanation}`
+        content: response.query_results && response.query_results.length > 0 && 
+          response.query_results[0].category && response.query_results[0].name && 
+          response.query_results[0].university && response.query_results[0].value !== null
+          ? `PLAYER_CARD:${JSON.stringify(response.query_results[0])}SUMMARY:${response.explanation}`
           : response.explanation,
       }
 
@@ -99,26 +101,25 @@ export default function ChatPage() {
                   </>
                 ) : (
                   <>
-                  {/* <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
-                    <AvatarFallback>
-                    <Bot className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar> */}
                   <Avatar className="h-12 w-12 bg-black-500 text-black text-lg">
                     <AvatarFallback>
-                    <Bot className="h-6 w-6" />
+                    <Bot className="h-6 w-" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="max-w-[80%] bg-muted rounded-lg p-4">
                     {message.content.includes("PLAYER_CARD:") ? (
-                    <>
-                      <PlayerCard player={extractPlayerData(message.content)} />
-                      <div className="mt-4">{extractSummary(message.content)}</div>
-                    </>
+                    <div>
+                      <div className="max-w-[50%]"><PlayerCard player={extractPlayerData(message.content)} /></div>
+                      <br />
+                      <div className="max-w-[80%] bg-muted rounded-lg p-4">
+                        <div className="mt-4">{extractSummary(message.content)}</div>
+                      </div>
+                    </div>
                     ) : (
+                    <div className="max-w-[80%] bg-muted rounded-lg p-4">
                     <div>{message.content}</div>
+                    </div>
                     )}
-                  </div>
+                  
                   </>
                 )}
                 </div>
@@ -126,14 +127,16 @@ export default function ChatPage() {
           ))
         )}
         {isLoading && (
-          <div className="flex justify-start">
+          <div className="flex justify-start ">
+            <div className="flex items-start gap-4">
+            <Avatar className="h-12 w-12 bg-black-500 text-black text-lg">
+                    <AvatarFallback>
+                    <Bot className="h-6 w-" />
+                    </AvatarFallback>
+                  </Avatar>
+            </div>
             <div className="max-w-[80%] bg-muted rounded-lg p-4">
               <div className="flex items-start gap-4">
-                <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
-                  <AvatarFallback>
-                    <Bot className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
                 <div className="flex space-x-2">
                   <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></div>
                   <div
