@@ -158,7 +158,7 @@ func GetResponse(c *gin.Context) {
 	fmt.Printf("Content: %v\n", content)
 
 	if content == "not related" {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"query_results": []interface{}{},
 			"explanation":   "I don't have enough knowledge to answer that question.",
 		})
@@ -172,7 +172,7 @@ func GetResponse(c *gin.Context) {
 	endIndex := strings.Index(content, endTag)
 
 	if startIndex == -1 || endIndex == -1 {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"query_results": []interface{}{},
 			"explanation":   "I don't have enough knowledge to answer that question.",
 		})
@@ -187,7 +187,7 @@ func GetResponse(c *gin.Context) {
 	if err := db.ORM.Raw(query).Scan(&results).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I don't have enough knowledge to answer that question.",
+			"error":         err.Error(),
 		})
 		return
 	}
