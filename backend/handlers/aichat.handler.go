@@ -98,7 +98,7 @@ func GetResponse(c *gin.Context) {
 	if err := c.ShouldBindJSON(&message); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "“I don’t have enough knowledge to answer that question.",
 			"error":         err.Error(),
 		})
 		return
@@ -125,7 +125,7 @@ func GetResponse(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "“I don’t have enough knowledge to answer that question.",
 			"error":         err.Error(),
 		})
 		return
@@ -134,7 +134,7 @@ func GetResponse(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "“I don’t have enough knowledge to answer that question.",
 			"error":         err.Error(),
 		})
 		return
@@ -149,7 +149,7 @@ func GetResponse(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "“I don’t have enough knowledge to answer that question.",
 			"error":         err.Error(),
 		})
 		return
@@ -161,7 +161,7 @@ func GetResponse(c *gin.Context) {
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "“I don’t have enough knowledge to answer that question.",
 			"error":         err.Error(),
 		})
 		return
@@ -189,7 +189,7 @@ func GetResponse(c *gin.Context) {
 	if startIndex == -1 || endIndex == -1 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "“I don’t have enough knowledge to answer that question.",
 		})
 		return
 	}
@@ -202,7 +202,7 @@ func GetResponse(c *gin.Context) {
 	if err := db.ORM.Raw(query).Scan(&results).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "“I don’t have enough knowledge to answer that question.",
 		})
 		return
 	}
