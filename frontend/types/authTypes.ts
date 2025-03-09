@@ -5,6 +5,7 @@ export interface User {
     created_at: string;
     approved: boolean;
     budget: number;
+    team_name: string;
   }
 
 export interface LoginResponse {

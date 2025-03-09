@@ -21,6 +21,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react"
+import { getChatMessages } from "@/services/chatService"
 
 export default function LeaderboardDashboard() {
   const [topScorers, setTopScorers] = useState<TopScorers | null>(null)
@@ -37,6 +38,7 @@ export default function LeaderboardDashboard() {
     const fetchData = async () => {
       try {
         setIsLoading(true)
+
         const [scorersData, teamData, leaderboardData] = await Promise.all([
           getTopScorers(),
           getMyTeam(),
