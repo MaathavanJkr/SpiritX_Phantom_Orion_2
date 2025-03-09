@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"go-orm-template/config"
 	"go-orm-template/db"
@@ -20,9 +21,11 @@ func main() {
 		log.Fatal("Database connection not established")
 	}
 
-	db.ORM.AutoMigrate(&models.User{})
-	db.ORM.AutoMigrate(&models.Team{})
-	db.ORM.AutoMigrate(&models.Player{})
+	if os.Getenv("MIGRATE") == "true" {
+		db.ORM.AutoMigrate(&models.User{})
+		db.ORM.AutoMigrate(&models.Team{})
+		db.ORM.AutoMigrate(&models.Player{})
+	}
 
 	r := router.NewRouter()
 	log.Fatal(r.Run(fmt.Sprintf(":%s", config.Port)))

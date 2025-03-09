@@ -2,6 +2,7 @@
 package handlers
 
 import (
+	"fmt"
 	"go-orm-template/auth"
 	"go-orm-template/models"
 	"net/http"
@@ -81,4 +82,37 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted user"})
+}
+
+func GetMyProfile(c *gin.Context) {
+	id, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found"})
+		return
+	}
+
+	// Convert uint to string for GetUserByID
+	idStr := fmt.Sprintf("%d", id.(uint))
+
+	user, err := models.GetUserByID(idStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	team, err := models.GetTeamByUserID(idStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	myProfile := models.MyProfile{
+		Name:            user.Name,
+		Username:        user.Username,
+		Budget:          user.Budget,
+		AvailableBudget: user.Budget - team.Value,
+		TeamName:        team.Name,
+	}
+
+	c.JSON(http.StatusOK, myProfile)
 }
