@@ -85,6 +85,8 @@ func UpdateTeam(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	NotifySubscribers("team", "update", &team.ID)
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully updated team"})
 }
 
@@ -156,6 +158,8 @@ func AssingPlayersToTeamByUserID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	NotifySubscribers("team", "update", nil)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully added players to team"})
 }
