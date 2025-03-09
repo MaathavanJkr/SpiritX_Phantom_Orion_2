@@ -138,7 +138,7 @@ func AddPlayer(player *Player) error {
 // GetPlayerByID retrieves a player record from the database by ID
 func GetPlayerByID(id string) (*Player, error) {
 	var player *Player
-	result := db.ORM.First(&player, id)
+	result := db.ORM.Preload("Teams").First(&player, id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -172,6 +172,9 @@ func GetPlayersByFilters(filters map[string]interface{}) ([]*Player, error) {
 func UpdatePlayerByID(player *Player) error {
 	CalculatePlayerStats(player)
 	result := db.ORM.Save(&player)
+
+	go UpdateAllTeamsPointsAndValue()
+
 	return result.Error
 }
 
@@ -179,6 +182,8 @@ func UpdatePlayerByID(player *Player) error {
 func DeletePlayerByID(id string) error {
 	var player *Player
 	result := db.ORM.Delete(&player, id)
+
+	go UpdateAllTeamsPointsAndValue()
 	return result.Error
 }
 

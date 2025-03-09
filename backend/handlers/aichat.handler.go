@@ -28,7 +28,7 @@ When responding to queries about players, follow these guidelines:
 - Overall value
 - Balanced mix of batsmen and bowlers
 
-4. If asked about information not in the dataset, respond with:
+4. If asked about information not in the dataset or asked about points respond with:
 'not related'
 
 5. Always return name, university, category, and value when providing player information
