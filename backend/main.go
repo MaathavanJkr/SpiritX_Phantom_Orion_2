@@ -22,14 +22,13 @@ func main() {
 		log.Fatal("Database connection not established")
 	}
 
-	if os.Getenv("MIGRATE") == "true" {
-		db.ORM.AutoMigrate(&models.User{})
-		db.ORM.AutoMigrate(&models.Team{})
-		db.ORM.AutoMigrate(&models.Player{})
-	}
-
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
+		case "migrate":
+			db.ORM.AutoMigrate(&models.User{})
+			db.ORM.AutoMigrate(&models.Team{})
+			db.ORM.AutoMigrate(&models.Player{})
+			return
 		case "players":
 			scripts.ImportPlayersFromCSV()
 			return

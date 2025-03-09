@@ -101,7 +101,7 @@ func NewRouter() *gin.Engine {
 	}
 
 	// Register WebSocket route
-	// r.GET("/players", handlers.PlayerWebSocket)
+	r.GET("/socket/players", handlers.PlayerWebSocket)
 
 	return r
 }
