@@ -25,9 +25,13 @@ func main() {
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "migrate":
+			fmt.Println("Migrating User...")
 			db.ORM.AutoMigrate(&models.User{})
+			fmt.Println("Migrating Team...")
 			db.ORM.AutoMigrate(&models.Team{})
+			fmt.Println("Migrating Player...")
 			db.ORM.AutoMigrate(&models.Player{})
+			fmt.Println("Migrating Finished.")
 			return
 		case "players":
 			scripts.ImportPlayersFromCSV()
