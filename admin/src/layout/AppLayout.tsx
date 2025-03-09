@@ -4,8 +4,22 @@ import AppHeader from "./AppHeader";
 import Backdrop from "./Backdrop";
 import AppSidebar from "./AppSidebar";
 
+import { useNavigate } from "react-router";
+import { useEffect } from "react";
+
 const LayoutContent: React.FC = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/signin");
+    }
+
+  }, []);
+    
+
 
   return (
     <div className="min-h-screen xl:flex">
