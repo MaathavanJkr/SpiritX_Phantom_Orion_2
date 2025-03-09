@@ -8,7 +8,7 @@ import {
 
 import { Player } from "../../types/player.type";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   getPlayers,
   updatePlayer,
@@ -17,7 +17,7 @@ import {
 
 import { ToastContainer, toast } from "react-toastify";
 import Badge from "../ui/badge/Badge";
-import Avatar from "../ui/avatar/Avatar";
+import { WebsocketContext } from "../../context/WebSocketContext";
 
 export default function PlayersTable() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -123,6 +123,20 @@ export default function PlayersTable() {
 
     fetchPlayers();
   }, []);
+
+  const [ready, val] = useContext(WebsocketContext); // use it just like a hook
+
+
+  useEffect(() => {
+    if (ready && val) {
+      console.log("Data received from websocket:", val);
+      getPlayers()
+        .then((data) => setPlayersData(data))
+        .catch((error) => console.error(error)).finally(() => {
+          console.log("Data fetched from websocket");
+        });
+    }
+  }, [ready, val]);
 
   return (
     <>

@@ -45,16 +45,6 @@ func PlayerWebSocket(c *gin.Context) {
 	}
 }
 
-func NotifySubscribers(action string, id *uint) {
-	// Notify via WebSocket
-	if wsConnection != nil {
-		err := wsConnection.WriteJSON(gin.H{"action": action, "id": id})
-		if err != nil {
-			fmt.Println("Error sending WebSocket message:", err)
-		}
-	}
-}
-
 func AddPlayer(c *gin.Context) {
 	var player models.Player
 	var err error
@@ -70,7 +60,7 @@ func AddPlayer(c *gin.Context) {
 		return
 	}
 
-	NotifySubscribers("add", &player.ID)
+	NotifySubscribers("player", "add", &player.ID)
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Successfully added player"})
 }
@@ -205,7 +195,7 @@ func UpdatePlayer(c *gin.Context) {
 		return
 	}
 
-	NotifySubscribers("update", &player.ID)
+	NotifySubscribers("player", "update", &player.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully updated player"})
 }
@@ -218,7 +208,7 @@ func DeletePlayer(c *gin.Context) {
 		return
 	}
 
-	NotifySubscribers("delete", nil)
+	NotifySubscribers("player", "delete", nil)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted player"})
 }
