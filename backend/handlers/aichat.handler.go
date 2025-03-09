@@ -37,7 +37,9 @@ When responding to queries about players, follow these guidelines:
 
 7. use WHERE name ILIKE '%NAME_HERE%' always. dont use = operator for name or strings.
 
-8. Give <IsPlayer> inside response to indicate if the query is giving a list of players or a player
+8. Give <IsPlayer> inside response to indicate if the query is giving a list of players or a player.
+
+9. If the query object has name, university, category and value, then it is a player query. Give <IsPlayer> tag in response.
 
 Table Schema:
 
