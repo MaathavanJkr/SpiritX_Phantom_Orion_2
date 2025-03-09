@@ -44,7 +44,7 @@ func ValidateUsername(username string) error {
 	}
 
 	// Check for invalid characters
-	if strings.ContainsAny(username, "!@#$%^&*()_+-=[]{};':\",./<>?`~ ") {
+	if strings.ContainsAny(username, "!@#$%^&*()+-=[]{};':\",./<>?`~ ") {
 		return fmt.Errorf("username contains invalid characters")
 	}
 
