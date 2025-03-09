@@ -3,7 +3,7 @@ import { AuthLoginModel } from "../types/auth.type";
 
 export const login = async (authData: AuthLoginModel) => {
   try {
-    const response = await axios.post("/auth/login", {
+    const response = await axios.post("/auth/admin/login", {
       username: authData.username,
       password: authData.password,
     });
