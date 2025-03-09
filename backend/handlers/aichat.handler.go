@@ -19,20 +19,6 @@ var initialPrompt = `You are an AI assistant helping users learn about cricket p
 When responding to queries about players, follow these guidelines:
 
 1. Only provide information from these available fields:
-- Name
-- University
-- Category 
-- Total runs
-- Balls faced
-- Innings played
-- Wickets
-- Overs bowled
-- Runs conceded
-- Value
-- Batting strike rate
-- Batting average
-- Bowling strike rate
-- Economy rate
 
 2. Never reveal or discuss player points under any circumstances
 
@@ -49,7 +35,9 @@ When responding to queries about players, follow these guidelines:
 
 6. Give SQL query inside <SQL>QUERY_HERE</SQL> tags
 
-7. Give <IsPlayer> inside response to indicate if the query is giving a list of players
+7. use WHERE name ILIKE '%NAME_HERE%' always. dont use = operator for name or strings.
+
+8. Give <IsPlayer> inside response to indicate if the query is giving a list of players or a player
 
 Table Schema:
 
@@ -74,9 +62,9 @@ players (
 var responsePrompt = `You are an AI assistant helping users learn about university cricket players and their statistics.
 
 When responding to queries:
-1. Only provide information that is available in the player's data (name, university, category, total_runs, balls_faced, innings_played, wickets, overs_bowled, runs_conceded, value, batting_strike_rate, batting_average, bowling_strike_rate, economy_rate)
+1. Only provide information that is available in the Query Results provided
 2. Never reveal or discuss player points
-3. If asked about information not in the dataset, respond with "I don't have enough knowledge to answer that question"
+3. If asked about information not in the QueryResults, respond with "I don't have enough knowledge to answer that question"
 4. For team suggestions, recommend players based on their statistics and value, not points
 5. When suggesting a team of 11 players, ensure a balanced mix of batsmen and bowlers based on their stats
 
@@ -93,25 +81,31 @@ Dont mention about SQL queries or database. Dont mention technical terms in resp
 Always maintain a helpful and informative tone while staying within these guidelines.`
 
 func GetResponse(c *gin.Context) {
-	var message models.Message
+	var messages []models.Message
 
-	if err := c.ShouldBindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
-			"error":         err.Error(),
+	if err := c.ShouldBindJSON(&messages); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	message.Role = "user"
-	messages := []models.Message{
+	var lastMessageContent string
+	if len(messages) > 0 {
+		lastMessageContent = messages[len(messages)-1].Content
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "No messages provided.",
+		})
+		return
+	}
+
+	messages = append([]models.Message{
 		{
 			Role:    "system",
 			Content: initialPrompt,
 		},
-		message,
-	}
+	}, messages...)
 
 	// Create request body
 	requestBody := map[string]interface{}{
@@ -124,18 +118,14 @@ func GetResponse(c *gin.Context) {
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
-			"error":         err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
 	req, err := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(jsonData))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
-			"error":         err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
@@ -148,9 +138,7 @@ func GetResponse(c *gin.Context) {
 	resp, err := client.Do(req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
-			"error":         err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
@@ -160,9 +148,7 @@ func GetResponse(c *gin.Context) {
 	var response models.Response
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
-			"error":         err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
@@ -175,7 +161,7 @@ func GetResponse(c *gin.Context) {
 	if content == "not related" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "Query not related to players table",
+			"explanation":   "I don't have enough knowledge to answer that question.",
 		})
 		return
 	}
@@ -189,7 +175,7 @@ func GetResponse(c *gin.Context) {
 	if startIndex == -1 || endIndex == -1 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "I don't have enough knowledge to answer that question.",
 		})
 		return
 	}
@@ -202,7 +188,7 @@ func GetResponse(c *gin.Context) {
 	if err := db.ORM.Raw(query).Scan(&results).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"query_results": []interface{}{},
-			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"explanation":   "I don't have enough knowledge to answer that question.",
 		})
 		return
 	}
@@ -210,8 +196,9 @@ func GetResponse(c *gin.Context) {
 	isPlayer := strings.Contains(content, "<IsPlayer>")
 
 	// Prepare data for second OpenAI request
-	secondPrompt := fmt.Sprintf("%s\n\nUser Query: %s\n\nSQL Query Used: %s\n\nQuery Results: %v", responsePrompt, message.Content, query, results)
+	secondPrompt := fmt.Sprintf("%s\n\nUser Query: %s\n\nSQL Query Used: %s\n\nQuery Results: %v", responsePrompt, lastMessageContent, query, results)
 
+	fmt.Printf("User Query: %s\n\nSQL Query Used: %s\n\nQuery Results: %v", lastMessageContent, query, results)
 	secondRequestBody := models.ChatRequest{
 		Model: "gpt-3.5-turbo",
 		Messages: []models.Message{
