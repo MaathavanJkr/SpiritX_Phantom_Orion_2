@@ -47,9 +47,15 @@ func AddTeam(team *Team) error {
 // AddPlayersToTeamByUserID adds players to a team by user ID and player IDs
 func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 	var team Team
-	result := db.ORM.Preload("Players").Preload("User").Where("user_id = ?", teamPlayers.UserID).First(&team)
+	result := db.ORM.Preload("User").Where("user_id = ?", teamPlayers.UserID).First(&team)
 	if result.Error != nil {
 		return result.Error
+	}
+
+	if len(teamPlayers.PlayerIDs) == 0 {
+		err := db.ORM.Model(&team).Association("Players").Clear()
+		go updateTeamPointsAndValue(&team)
+		return err
 	}
 
 	var players []*Player
@@ -59,16 +65,14 @@ func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 	}
 
 	// Check if adding the new players would exceed the maximum limit of 11 players
-	if len(team.Players)+len(players) > 11 {
-		return fmt.Errorf("adding these players would exceed the maximum limit of 11 players per team")
+	if len(players) > 11 {
+		return fmt.Errorf("maximum limit of 11 players per team exceeded by %d", len(players)-11)
 	}
 
 	// Calculate the total value of all players in the team
 	totalValue := 0
-	totalPoints := 0
 	for _, player := range players {
-		totalValue += *player.Value // Assuming Player struct has a Value field
-		totalPoints += *player.Points
+		totalValue += *player.Value
 	}
 
 	// Check if the total value exceeds the user's budget
@@ -76,14 +80,37 @@ func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 		return fmt.Errorf("the total value of the players exceeds the user's budget")
 	}
 
-	team.Points = totalPoints
-	team.Value = totalValue
-
-	UpdateTeamByID(&team)
+	go updateTeamPointsAndValue(&team)
 
 	// Append players to the team's Players association
 	err := db.ORM.Model(&team).Association("Players").Replace(players)
 	return err
+}
+
+func updateTeamPointsAndValue(team *Team) {
+	totalValue := 0
+	totalPoints := 0
+	for _, player := range team.Players {
+		totalValue += *player.Value
+		totalPoints += *player.Points
+	}
+
+	team.Points = totalPoints
+	team.Value = totalValue
+
+	UpdateTeamByID(team)
+}
+
+func UpdateAllTeamsPointsAndValue() {
+	teams, err := GetAllTeams()
+	if err != nil {
+		fmt.Printf("Error updating all teams points and value: %v\n", err)
+		return
+	}
+	for _, team := range teams {
+		updateTeamPointsAndValue(team)
+	}
+	fmt.Printf("Updated all teams points and value\n")
 }
 
 // GetTeamPlayersViewByUserID retrieves a team and its players by user ID and returns it as TeamPlayersView
@@ -125,6 +152,22 @@ func GetTeamByUserID(userID string) (*Team, error) {
 		return nil, result.Error
 	}
 	return team, nil
+}
+
+func GetTeamsByPlayerID(playerID uint) ([]*Team, error) {
+	var teams []*Team
+	result := db.ORM.Model(&Team{}).
+		Joins("JOIN player_teams ON player_teams.team_id = teams.id").
+		Where("player_teams.player_id = ?", playerID).
+		Find(&teams)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	for _, team := range teams {
+		fmt.Printf("Team Name: %s, Points: %d, Value: %d\n", team.Name, team.Points, team.Value)
+	}
+	return teams, nil
 }
 
 func GetAllTeams() ([]*Team, error) {
