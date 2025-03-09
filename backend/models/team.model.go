@@ -14,6 +14,7 @@ type Team struct {
 	Players []*Player `json:"players" gorm:"many2many:team_players;"`
 	Points  int       `json:"points"`
 	Value   int       `json:"value"`
+	Full    bool      `json:"full"`
 }
 
 // convertPlayers converts []*Player to []Player
@@ -80,11 +81,15 @@ func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 		return fmt.Errorf("the total value of the players exceeds the user's budget")
 	}
 
-	go updateTeamPointsAndValue(&team)
-
 	// Append players to the team's Players association
 	err := db.ORM.Model(&team).Association("Players").Replace(players)
-	return err
+	if err != nil {
+		return err
+	}
+	team.Full = len(players) == 11
+	team.Players = players
+	go updateTeamPointsAndValue(&team)
+	return nil
 }
 
 func updateTeamPointsAndValue(team *Team) {
@@ -108,6 +113,7 @@ func UpdateAllTeamsPointsAndValue() {
 		return
 	}
 	for _, team := range teams {
+		team.Full = len(team.Players) == 11
 		updateTeamPointsAndValue(team)
 	}
 	fmt.Printf("Updated all teams points and value\n")
@@ -207,8 +213,7 @@ func DeleteTeamByID(id string) error {
 
 func GetTeamLeaderBoard() ([]*Team, error) {
 	var teams []*Team
-
-	result := db.ORM.Model(&Team{}).Preload("Players").Preload("User").Find(&teams).Order("Points desc")
+	result := db.ORM.Model(&Team{}).Preload("User").Where(&Team{Full: true}).Order("points desc").Find(&teams)
 	if result.Error != nil {
 		return nil, result.Error
 	}
