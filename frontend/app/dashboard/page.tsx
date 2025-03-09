@@ -157,7 +157,6 @@ export default function LeaderboardDashboard() {
 
   // Calculate if user is above or below average
   const pointsVsAverage = currentUserPoints !== null ? currentUserPoints - averagePoints : null
-
   return (
     <div className="w-full space-y-6">
       {/* User's Team Stats */}

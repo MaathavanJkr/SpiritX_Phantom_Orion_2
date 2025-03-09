@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from 'react';
 import AuthForm from "@/components/auth/auth-form";
+import LoginPage from "./auth/login/page";
 
 export default function Home() {
   const router = useRouter();
@@ -22,10 +23,6 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-      <div className="w-full max-w-md">
-          <AuthForm />
-      </div>
-    </main>
+        <LoginPage />
   );
 }

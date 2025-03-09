@@ -15,7 +15,7 @@ import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { getPlayers } from "@/services/playerService"
 import { addPlayerToTeam } from "@/services/teamService"
-import { getMyTeam, createMyTeam } from "@/services/teamService"
+import { getMyTeam, createMyTeamName } from "@/services/teamService"
 import type { MyTeam } from "@/types/teamTypes"
 
 import { useRouter } from "next/navigation"
@@ -53,13 +53,11 @@ export default function AddPlayersPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = localStorage.getItem("user_id")
-        if (userId) {
-          const userData = await getUserDetails(userId)
+       
+          const userData = await getUserDetails()
           setUser(userData)
           setInitialBudget(userData.budget)
           setAvailableBudget(userData.budget)
-        }
       } catch (err) {
         console.error("Failed to fetch user data:", err)
       }
@@ -268,17 +266,7 @@ export default function AddPlayersPage() {
     }
 
     try {
-      const userId = localStorage.getItem("user_id")
-      if (!userId) {
-        toast({
-          title: "Error",
-          description: "User ID not found",
-          variant: "destructive",
-        })
-        return
-      }
-
-      await createMyTeam(teamName, Number(userId))
+      await createMyTeamName(teamName)
       toast({
         title: "Team created",
         description: `Your team "${teamName}" has been created successfully`,

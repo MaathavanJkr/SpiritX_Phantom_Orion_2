@@ -25,7 +25,7 @@ export const register = async (username: string, password: string) => {
     }
 }
 
-export const getUserDetails = async (userID: string,) => {
+export const getUserDetails = async () => {
     try {
         const response = await axios.get('/v1/users/my');
         return response.data;

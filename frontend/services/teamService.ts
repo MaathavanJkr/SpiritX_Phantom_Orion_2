@@ -10,11 +10,10 @@ export const getMyTeam = async (): Promise<MyTeam> => {
   }
 }
 
-export const createMyTeam = async (team_name: string, user_id: number): Promise<any> => {
+export const createMyTeamName = async (team_name: string,): Promise<any> => {
   try {
-    const response = await axios.post("/teams/add", {
+    const response = await axios.put("/v1/teams/my", {
       name: team_name,
-      user_id: user_id,
     })
     return response.data
   } catch (error: any) {

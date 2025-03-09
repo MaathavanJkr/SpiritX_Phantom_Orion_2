@@ -11,7 +11,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token"); // Check token
-    if (!token) {
+    if (!token && !window.location.pathname.includes("/auth")) {
       router.push("/");
     }
   }, []);
