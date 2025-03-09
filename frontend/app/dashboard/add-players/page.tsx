@@ -235,7 +235,8 @@ export default function AddPlayersPage() {
       })
       return
     }
-
+    
+    console.log("playerIds", playerIds)
     try {
       await addPlayerToTeam(playerIds)
       toast({
@@ -243,7 +244,6 @@ export default function AddPlayersPage() {
         description: `Your team of ${selectedPlayers.length} players has been saved`,
       })
 
-      // Close dialog and redirect to summary
       setShowSaveDialog(false)
       router.push("/dashboard/")
     } catch (error: any) {
