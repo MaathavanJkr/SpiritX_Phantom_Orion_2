@@ -31,6 +31,11 @@ const navItems: NavItem[] = [
       { name: "View Players", path: "/players", pro: false },
     ],
   },
+  {
+    icon: <GridIcon />,
+    name: "Leaderboard",
+    path: "/leaderboard",
+  }
   // {
   //   icon: <CalenderIcon />,
   //   name: "Calendar",
