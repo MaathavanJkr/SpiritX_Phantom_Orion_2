@@ -99,20 +99,21 @@ func GetMyProfile(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	team, err := models.GetTeamByUserID(idStr)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
 	myProfile := models.MyProfile{
 		Name:            user.Name,
 		Username:        user.Username,
 		Budget:          user.Budget,
-		AvailableBudget: user.Budget - team.Value,
-		TeamName:        team.Name,
+		AvailableBudget: user.Budget,
 	}
+
+	team, err := models.GetTeamByUserID(idStr)
+	if err != nil {
+		c.JSON(http.StatusOK, myProfile)
+		return
+	}
+
+	myProfile.TeamName = team.Name
+	myProfile.AvailableBudget = user.Budget - team.Value
 
 	c.JSON(http.StatusOK, myProfile)
 }

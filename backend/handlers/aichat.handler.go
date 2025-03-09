@@ -49,6 +49,8 @@ When responding to queries about players, follow these guidelines:
 
 6. Give SQL query inside <SQL>QUERY_HERE</SQL> tags
 
+7. Give <IsPlayer> inside response to indicate if the query is giving a list of players
+
 Table Schema:
 
 players (
@@ -69,7 +71,7 @@ players (
   economy_rate numeric
 )`
 
-var responsePrompt = `You are an AI assistant helping users learn about cricket players and their statistics.
+var responsePrompt = `You are an AI assistant helping users learn about university cricket players and their statistics.
 
 When responding to queries:
 1. Only provide information that is available in the player's data (name, university, category, total_runs, balls_faced, innings_played, wickets, overs_bowled, runs_conceded, value, batting_strike_rate, batting_average, bowling_strike_rate, economy_rate)
@@ -94,7 +96,11 @@ func GetResponse(c *gin.Context) {
 	var message models.Message
 
 	if err := c.ShouldBindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"query_results": []interface{}{},
+			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"error":         err.Error(),
+		})
 		return
 	}
 
@@ -117,12 +123,20 @@ func GetResponse(c *gin.Context) {
 	client := &http.Client{}
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"query_results": []interface{}{},
+			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"error":         err.Error(),
+		})
 		return
 	}
 	req, err := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(jsonData))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"query_results": []interface{}{},
+			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"error":         err.Error(),
+		})
 		return
 	}
 
@@ -133,7 +147,11 @@ func GetResponse(c *gin.Context) {
 	// Send request
 	resp, err := client.Do(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"query_results": []interface{}{},
+			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"error":         err.Error(),
+		})
 		return
 	}
 	defer resp.Body.Close()
@@ -141,7 +159,11 @@ func GetResponse(c *gin.Context) {
 	// Parse response
 	var response models.Response
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"query_results": []interface{}{},
+			"explanation":   "I couldnt interpret your prompt. Please try again.",
+			"error":         err.Error(),
+		})
 		return
 	}
 
@@ -165,7 +187,10 @@ func GetResponse(c *gin.Context) {
 	endIndex := strings.Index(content, endTag)
 
 	if startIndex == -1 || endIndex == -1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No SQL query found in response"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"query_results": []interface{}{},
+			"explanation":   "I couldnt interpret your prompt. Please try again.",
+		})
 		return
 	}
 
@@ -176,24 +201,22 @@ func GetResponse(c *gin.Context) {
 	var results []map[string]interface{}
 	if err := db.ORM.Raw(query).Scan(&results).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Error executing query",
-			"details": err.Error(),
+			"query_results": []interface{}{},
+			"explanation":   "I couldnt interpret your prompt. Please try again.",
 		})
 		return
 	}
 
+	isPlayer := strings.Contains(content, "<IsPlayer>")
+
 	// Prepare data for second OpenAI request
-	secondPrompt := fmt.Sprintf("User Query: %s\n\nSQL Query Used: %s\n\nQuery Results: %v\n\n%s", message.Content, query, results, responsePrompt)
+	secondPrompt := fmt.Sprintf("%s\n\nUser Query: %s\n\nSQL Query Used: %s\n\nQuery Results: %v", responsePrompt, message.Content, query, results)
 
 	secondRequestBody := models.ChatRequest{
 		Model: "gpt-3.5-turbo",
 		Messages: []models.Message{
 			{
 				Role:    "system",
-				Content: "You are a helpful assistant explaining cricket player statistics and analysis.",
-			},
-			{
-				Role:    "user",
 				Content: secondPrompt,
 			},
 		},
@@ -237,6 +260,6 @@ func GetResponse(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"query_results": results,
 		"explanation":   explanation,
+		"is_player":     isPlayer,
 	})
-	return
 }
