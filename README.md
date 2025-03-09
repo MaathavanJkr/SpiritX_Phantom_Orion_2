@@ -3,7 +3,26 @@
 To start using Spirit11, follow these steps:
 
 
+### Backend
+1. **Set up environment variables:**
+    Create a `.env` file in the root directory and add the necessary environment variables. Refer to `.env.example` for the required variables.
+
+2. **Install Go:**
+    Ensure Go is installed on your system. If not, download and install it from [golang.org](https://golang.org/).
+
+3. **Install the required dependencies:**
+    ```bash
+    go mod download
+    ```
+
+4. **Run the backend application:**
+    ```bash
+    go run .
+    ```
+
 ### Frontend User
+
+
 1. **Navigate to the frontend directory:**
     ```bash
     cd frontend
@@ -35,22 +54,6 @@ To start using Spirit11, follow these steps:
     npm run dev
     ```
 
-### Backend
-1. **Set up environment variables:**
-    Create a `.env` file in the root directory and add the necessary environment variables. Refer to `.env.example` for the required variables.
-
-2. **Install Go:**
-    Ensure Go is installed on your system. If not, download and install it from [golang.org](https://golang.org/).
-
-3. **Install the required dependencies:**
-    ```bash
-    go mod download
-    ```
-
-4. **Run the backend application:**
-    ```bash
-    go run .
-    ```
 
 4. **Access the application:**
     Open your web browser and navigate to `http://localhost:8080`.
