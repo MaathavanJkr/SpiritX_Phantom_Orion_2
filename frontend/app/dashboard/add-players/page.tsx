@@ -145,7 +145,7 @@ export default function AddPlayersPage() {
   }, [searchQuery, categoryFilter, players])
 
   // Get unique categories for filter
-  const categories = [...new Set(players.map((player) => player.category))]
+  const categories = Array.isArray(players) ? [...new Set(players.map((player) => player.category))] : []
 
   // Add player to selection
   const addPlayer = (player: Player) => {
@@ -225,27 +225,19 @@ export default function AddPlayersPage() {
     }
 
     const playerIds = selectedPlayers.map((player) => player.id)
-    const token = localStorage.getItem("auth_token")
 
-    if (!token) {
-      toast({
-        title: "Error",
-        description: "No auth token found",
-        variant: "destructive",
-      })
-      return
-    }
-    
-    console.log("playerIds", playerIds)
     try {
       await addPlayerToTeam(playerIds)
       toast({
         title: "Team saved",
         description: `Your team of ${selectedPlayers.length} players has been saved`,
       })
+      console.log("Team saved successfully")
+      setIsEditMode(!isEditMode)
 
       setShowSaveDialog(false)
-      router.push("/dashboard/")
+    //   router.push("/dashboard/leaderboard")
+      window.location.reload() // Hard refresh
     } catch (error: any) {
       toast({
         title: "Error",

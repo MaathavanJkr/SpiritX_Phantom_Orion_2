@@ -9,8 +9,8 @@ export default function ChatPage() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat()
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Sprit 11 Cricket Assistant</h1>
+    <div className="flex flex-col h-[90vh] max-w-4xl mx-auto p-4">
+    <h1 className="text-2xl font-bold mb-4 text-center">Sprit 11 Cricket Assistant</h1>
 
       <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 rounded-lg border">
         {messages.length === 0 ? (
