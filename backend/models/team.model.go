@@ -13,6 +13,7 @@ type Team struct {
 	User    *User     `json:"user" gorm:"foreignKey:UserID"`
 	Players []*Player `json:"players" gorm:"many2many:team_players;"`
 	Points  int       `json:"points"`
+	Value   int       `json:"value"`
 }
 
 // convertPlayers converts []*Player to []Player
@@ -28,6 +29,7 @@ type TeamPlayersView struct {
 	TeamName string   `json:"team_name"`
 	Players  []Player `json:"players"`
 	IsFound  bool     `json:"is_found"`
+	Value    int      `json:"value"`
 	Points   int      `json:"points"`
 }
 
@@ -75,6 +77,7 @@ func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 	}
 
 	team.Points = totalPoints
+	team.Value = totalValue
 
 	UpdateTeamByID(&team)
 
@@ -84,7 +87,7 @@ func AssignPlayersToTeamByUserID(teamPlayers TeamPlayers) error {
 }
 
 // GetTeamPlayersViewByUserID retrieves a team and its players by user ID and returns it as TeamPlayersView
-func GetTeamPlayersViewForUser(userID uint) (*TeamPlayersView, error) {
+func GetMyTeamModel(userID uint) (*TeamPlayersView, error) {
 	var team Team
 	result := db.ORM.Preload("Players").Where("user_id = ?", userID).First(&team)
 	if result.Error != nil {
@@ -97,6 +100,7 @@ func GetTeamPlayersViewForUser(userID uint) (*TeamPlayersView, error) {
 		TeamName: team.Name,
 		Players:  convertPlayers(team.Players),
 		Points:   team.Points,
+		Value:    team.Value,
 		IsFound:  true,
 	}
 

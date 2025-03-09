@@ -130,14 +130,14 @@ func AssingPlayersToTeamByUserID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully added players to team"})
 }
 
-func GetTeamPlayersViewForUser(c *gin.Context) {
+func GetMyTeam(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found"})
 		return
 	}
 
-	teamPlayersView, err := models.GetTeamPlayersViewForUser(userID.(uint))
+	teamPlayersView, err := models.GetMyTeamModel(userID.(uint))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
