@@ -51,15 +51,51 @@ type PlayerForUser struct {
 }
 
 func CalculatePlayerStats(player *Player) {
-	player.BattingStrikeRate = math.Round((float64(player.TotalRuns)/float64(player.BallsFaced)*100)*100) / 100
-	player.BattingAverage = math.Round((float64(player.TotalRuns)/float64(player.InningsPlayed))*100) / 100
-	player.BowingStrikeRate = math.Round((float64(player.OversBowled)/float64(player.Wickets))*100) / 100
-	player.EconomyRate = math.Round((float64(player.RunsConceded)/float64(player.OversBowled*6))*100) / 100
+	player.BattingStrikeRate = safeDivide(float64(player.TotalRuns)*100, float64(player.BallsFaced))
+	player.BattingAverage = safeDivide(float64(player.TotalRuns), float64(player.InningsPlayed))
+	player.BowingStrikeRate = safeDivide(float64(player.OversBowled)*100, float64(player.Wickets))
+	player.EconomyRate = safeDivide(float64(player.RunsConceded)*100, float64(player.OversBowled*6))
 
-	player.Points = int((player.BattingStrikeRate/5 + player.BattingAverage*0.8 + (500 / player.BowingStrikeRate) + (140 / player.EconomyRate)))
+	bowlingStrikeRate := player.BowingStrikeRate
+	if math.IsNaN(bowlingStrikeRate) {
+		bowlingStrikeRate = 0
+	}
+
+	if player.BowingStrikeRate == 0 && player.EconomyRate == 0 {
+		player.Points = int((player.BattingStrikeRate/5 + player.BattingAverage*0.8))
+	} else if player.BowingStrikeRate == 0 {
+		player.Points = int((player.BattingStrikeRate/5 + player.BattingAverage*0.8 + (140 / player.EconomyRate)))
+	} else if player.EconomyRate == 0 {
+		player.Points = int((player.BattingStrikeRate/5 + player.BattingAverage*0.8 + (500 / bowlingStrikeRate)))
+	} else {
+		player.Points = int((player.BattingStrikeRate/5 + player.BattingAverage*0.8 + (500 / bowlingStrikeRate) + (140 / player.EconomyRate)))
+	}
+
 	player.Value = int((9*float64(player.Points) + 100) * 1000)
 	player.Value = (player.Value + 49999) / 50000 * 50000 // Round to the nearest multiple of 50,000
+	player.BattingStrikeRate = math.Round(player.BattingStrikeRate*100) / 100
+	player.BattingAverage = math.Round(player.BattingAverage*100) / 100
+	player.BowingStrikeRate = math.Round(player.BowingStrikeRate*100) / 100
+	player.EconomyRate = math.Round(player.EconomyRate*100) / 100
 }
+
+func safeDivide(numerator, denominator float64) float64 {
+	if denominator == 0 {
+		return math.NaN()
+	}
+	return numerator / denominator
+}
+
+// func CalculatePlayerStats(player *Player) {
+// 	player.BattingStrikeRate = math.Round((float64(player.TotalRuns)/float64(player.BallsFaced)*100)*100) / 100
+// 	player.BattingAverage = math.Round((float64(player.TotalRuns)/float64(player.InningsPlayed))*100) / 100
+// 	player.BowingStrikeRate = math.Round((float64(player.OversBowled)/float64(player.Wickets))*100) / 100
+// 	player.EconomyRate = math.Round((float64(player.RunsConceded)/float64(player.OversBowled*6))*100) / 100
+
+// 	player.Points = int((player.BattingStrikeRate/5 + player.BattingAverage*0.8 + (500 / player.BowingStrikeRate) + (140 / player.EconomyRate)))
+// 	player.Value = int((9*float64(player.Points) + 100) * 1000)
+// 	player.Value = (player.Value + 49999) / 50000 * 50000 // Round to the nearest multiple of 50,000
+// }
 
 // AddPlayer creates a new player record in the database
 func AddPlayer(player *Player) error {
