@@ -58,6 +58,9 @@ var routes = []Route{
 	{Path: "/v1/teams/my", Security: "User", Method: "GET", Handler: handlers.GetMyTeam},
 	{Path: "/v1/teams/my", Security: "User", Method: "PUT", Handler: handlers.UpdateMyTeam},
 	{Path: "/v1/teams/leaderboard", Security: "User", Method: "GET", Handler: handlers.GetTeamLeaderBoard},
+
+	//AI Chat routes
+	{Path: "/v1/ai/chat", Security: "User", Method: "POST", Handler: handlers.GetResponse},
 }
 
 func NewRouter() *gin.Engine {

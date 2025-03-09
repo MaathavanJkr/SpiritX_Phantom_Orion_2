@@ -4,19 +4,107 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"go-orm-template/db"
 	"go-orm-template/models"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetResponse(c *gin.Context) {
-	var messages []models.Message
+var initialPrompt = `You are an AI assistant helping users learn about cricket players and their statistics.
 
-	if err := c.ShouldBindJSON(&messages); err != nil {
+When responding to queries about players, follow these guidelines:
+
+1. Only provide information from these available fields:
+- Name
+- University
+- Category 
+- Total runs
+- Balls faced
+- Innings played
+- Wickets
+- Overs bowled
+- Runs conceded
+- Value
+- Batting strike rate
+- Batting average
+- Bowling strike rate
+- Economy rate
+
+2. Never reveal or discuss player points under any circumstances
+
+3. For team suggestions, recommend players based on:
+- Batting performance (strike rate, average)
+- Bowling performance (economy rate, strike rate) 
+- Overall value
+- Balanced mix of batsmen and bowlers
+
+4. If asked about information not in the dataset, respond with:
+'not related'
+
+5. Always return name, university, category, and value when providing player information
+
+6. Give SQL query inside <SQL>QUERY_HERE</SQL> tags
+
+Table Schema:
+
+players (
+  id int8,
+  name text,
+  university text, 
+  category text,
+  total_runs int8,
+  balls_faced int8,
+  innings_played int8,
+  wickets int8,
+  overs_bowled numeric,
+  runs_conceded int8,
+  value int8,
+  batting_strike_rate numeric,
+  batting_average numeric,
+  bowling_strike_rate numeric,
+  economy_rate numeric
+)`
+
+var responsePrompt = `You are an AI assistant helping users learn about cricket players and their statistics.
+
+When responding to queries:
+1. Only provide information that is available in the player's data (name, university, category, total_runs, balls_faced, innings_played, wickets, overs_bowled, runs_conceded, value, batting_strike_rate, batting_average, bowling_strike_rate, economy_rate)
+2. Never reveal or discuss player points
+3. If asked about information not in the dataset, respond with "I don't have enough knowledge to answer that question"
+4. For team suggestions, recommend players based on their statistics and value, not points
+5. When suggesting a team of 11 players, ensure a balanced mix of batsmen and bowlers based on their stats
+
+For specific player queries, use their actual statistics from the database to provide accurate information.
+
+If asked about best team selection, analyze players based on:
+- Batting performance (strike rate, average)
+- Bowling performance (economy rate, strike rate)
+- Overall value
+- Balance of skills across the 11 players
+
+Dont mention about SQL queries or database. Dont mention technical terms in response. Give response to user queries based on the data available in the database.
+
+Always maintain a helpful and informative tone while staying within these guidelines.`
+
+func GetResponse(c *gin.Context) {
+	var message models.Message
+
+	if err := c.ShouldBindJSON(&message); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	message.Role = "user"
+	messages := []models.Message{
+		{
+			Role:    "system",
+			Content: initialPrompt,
+		},
+		message,
 	}
 
 	// Create request body
@@ -57,5 +145,98 @@ func GetResponse(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	// Extract SQL query from response
+	content := response.Choices[0].Message.Content
+
+	fmt.Printf("Content: %v\n", content)
+
+	if content == "not related" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"query_results": []interface{}{},
+			"explanation":   "Query not related to players table",
+		})
+		return
+	}
+
+	// Find SQL query between tags
+	startTag := "<SQL>"
+	endTag := "</SQL>"
+	startIndex := strings.Index(content, startTag)
+	endIndex := strings.Index(content, endTag)
+
+	if startIndex == -1 || endIndex == -1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No SQL query found in response"})
+		return
+	}
+
+	// Extract the query
+	query := content[startIndex+len(startTag) : endIndex]
+
+	// Execute the query
+	var results []map[string]interface{}
+	if err := db.ORM.Raw(query).Scan(&results).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error executing query",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Prepare data for second OpenAI request
+	secondPrompt := fmt.Sprintf("User Query: %s\n\nSQL Query Used: %s\n\nQuery Results: %v\n\n%s", message.Content, query, results, responsePrompt)
+
+	secondRequestBody := models.ChatRequest{
+		Model: "gpt-3.5-turbo",
+		Messages: []models.Message{
+			{
+				Role:    "system",
+				Content: "You are a helpful assistant explaining cricket player statistics and analysis.",
+			},
+			{
+				Role:    "user",
+				Content: secondPrompt,
+			},
+		},
+	}
+
+	secondJsonData, err := json.Marshal(secondRequestBody)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Create second request to OpenAI
+	secondReq, err := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(secondJsonData))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	secondReq.Header.Add("Content-Type", "application/json")
+	secondReq.Header.Add("Authorization", "Bearer "+os.Getenv("OPENAI_API_KEY"))
+
+	// Send second request
+	secondResp, err := client.Do(secondReq)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer secondResp.Body.Close()
+
+	// Parse second response
+	var secondResponse models.Response
+	if err := json.NewDecoder(secondResp.Body).Decode(&secondResponse); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Extract the explanation
+	explanation := secondResponse.Choices[0].Message.Content
+
+	// Return both the AI response and query results
+	c.JSON(http.StatusOK, gin.H{
+		"query_results": results,
+		"explanation":   explanation,
+	})
+	return
 }
