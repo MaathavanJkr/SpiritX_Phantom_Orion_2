@@ -98,6 +98,36 @@ func DeleteTeam(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted team"})
 }
 
+func UpdateMyTeam(c *gin.Context) {
+	id, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found"})
+		return
+	}
+
+	team := &models.Team{}
+
+	team, err := models.GetTeamByUserID(fmt.Sprintf("%v", id))
+
+	if err != nil {
+		team = &models.Team{
+			UserID: id.(uint),
+		}
+	}
+
+	if err := c.ShouldBindJSON(&team); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = models.UpdateTeamByID(team)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully updated team"})
+}
+
 //Add players to the team by user
 
 func AssingPlayersToTeamByUserID(c *gin.Context) {
@@ -123,7 +153,7 @@ func AssingPlayersToTeamByUserID(c *gin.Context) {
 
 	err := models.AssignPlayersToTeamByUserID(teamPlayers)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

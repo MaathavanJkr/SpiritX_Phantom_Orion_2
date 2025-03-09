@@ -117,6 +117,16 @@ func GetTeamByID(id string) (*Team, error) {
 	return team, nil
 }
 
+func GetTeamByUserID(userID string) (*Team, error) {
+	var team *Team
+	result := db.ORM.Where("user_id = ?", userID).First(&team)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return team, nil
+}
+
 func GetAllTeams() ([]*Team, error) {
 	var teams []*Team
 
