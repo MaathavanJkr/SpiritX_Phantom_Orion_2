@@ -111,42 +111,6 @@ export default function LeaderboardPage() {
 
   // Chart colors
   const chartColors = ["#FFD700", "#C0C0C0", "#CD7F32", "#4CAF50", "#2196F3"]
-  const pieChartColors = ["#4394E5", "#F8AE54", "#CB6A6E9", "#E0E0E0", "#876FD4"]
-
-  const categoryDistribution =
-    currentUserTeam?.players.reduce(
-      (acc, player) => {
-        const category = player.category || "Unknown"
-        acc[category] = (acc[category] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    ) || {}
-
-  // Format for pie chart
-  const categoryPieData = Object.entries(categoryDistribution).map(([name, value]) => ({
-    name,
-    value,
-  }))
-
-  // Calculate points difference from the team above
-  const getPointsDifference = (rank: number) => {
-    if (rank <= 1 || !currentUserRank) return null
-    const teamAbove = sortedLeaderboard[currentUserRank - 2] // -1 for 0-index, -1 for team above
-    const currentTeam = sortedLeaderboard[currentUserRank - 1] // -1 for 0-index
-
-    if (!teamAbove || !currentTeam) return null
-    return teamAbove.points - currentTeam.points
-  }
-
-  const pointsDifference = getPointsDifference(currentUserRank || 0)
-
-  // Calculate average points
-  const averagePoints =
-    leaderboard.length > 0 ? leaderboard.reduce((sum, team) => sum + team.points, 0) / leaderboard.length : 0
-
-  // Calculate if user is above or below average
-  const pointsVsAverage = currentUserPoints !== null ? currentUserPoints - averagePoints : null
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -224,7 +188,6 @@ export default function LeaderboardPage() {
               <div className="col-span-1">Rank</div>
               <div className="col-span-4">Team</div>
               <div className="col-span-3">Owner</div>
-              <div className="col-span-2">Players</div>
               <div className="col-span-2 text-right">Points</div>
             </div>
 
@@ -256,7 +219,6 @@ export default function LeaderboardPage() {
                     </Avatar>
                     {team.user.username}
                   </div>
-                  <div className="col-span-2 text-muted-foreground">{team.players.length}</div>
                   <div className="col-span-2 text-right">
                     <Badge className={`${index < 3 ? "bg-primary text-white" : "bg-muted text-black"} font-medium`}>{team.points} pts</Badge>
                   </div>

@@ -31,7 +31,7 @@ export default function LeaderboardDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [currentUserPoints, setCurrentUserPoints] = useState<number | null>(null)
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null)
-  const [currentUserTeam, setCurrentUserTeam] = useState<Leaderboard | null>(null)
+  const [currentUserTeam, setCurrentUserTeam] = useState<MyTeam | null>(null)
   
 
   useEffect(() => {
@@ -55,12 +55,10 @@ export default function LeaderboardDashboard() {
           const userIdNum = Number.parseInt(userId)
 
           // Find current user's team in leaderboard
-          const userTeam = leaderboardData.find((team: { user_id: number }) => team.user_id === userIdNum)
-          if (userTeam) {
+          const userTeam = await getMyTeam()
+          if (userTeam.players) {
             setCurrentUserPoints(userTeam.points)
             setCurrentUserTeam(userTeam)
-
-            // Calculate user's rank
             const rank =
               leaderboardData.sort((a: { points: number }, b: { points: number }) => b.points - a.points).findIndex((team: { user_id: number }) => team.user_id === userIdNum) + 1
             setCurrentUserRank(rank)
@@ -126,7 +124,7 @@ export default function LeaderboardDashboard() {
   const pieChartColors = ["#4394E5", "#F8AE54", "#CB6A6E9", "#E0E0E0", "#876FD4"]
 
   const categoryDistribution =
-    currentUserTeam?.players.reduce(
+    currentUserTeam?.players?.reduce(
       (acc, player) => {
         const category = player.category || "Unknown"
         acc[category] = (acc[category] || 0) + 1
@@ -170,21 +168,22 @@ export default function LeaderboardDashboard() {
                 <Trophy className="h-5 w-5 text-primary" />
                 Your Team Performance
               </CardTitle>
-              <CardDescription>{myTeam?.team_name || currentUserTeam.name}</CardDescription>
+              <CardDescription>{myTeam?.team_name || currentUserTeam.team_name}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 <div className="flex flex-col items-center">
                   <div className="text-5xl font-bold text-primary">{currentUserPoints}</div>
                   <div className="text-sm text-muted-foreground mt-1">Total Points</div>
-
-                  <div className="mt-4 flex items-center gap-1">
-                    <Medal className={`h-5 w-5 ${getMedalColor(currentUserRank - 1)}`} />
-                    <span className="text-xl font-semibold">
+                    {currentUserTeam?.players?.length === 11 && (
+                    <div className="mt-4 flex items-center gap-1">
+                      <Medal className={`h-5 w-5 ${getMedalColor(currentUserRank - 1)}`} />
+                      <span className="text-xl font-semibold">
                       Rank: {currentUserRank}
                       {getOrdinalSuffix(currentUserRank)}
-                    </span>
-                  </div>
+                      </span>
+                    </div>
+                    )}
                 </div>
 
                 <Separator orientation="vertical" className="h-24 hidden md:block" />
